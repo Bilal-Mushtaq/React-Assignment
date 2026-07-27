@@ -234,7 +234,10 @@ export function WidgetGrid() {
         onResizeStart={markInteractionStart}
         onDragStop={(layout) => commitInteraction(layout)}
         onResizeStop={(layout) => commitInteraction(layout)}
-        breakpoints={{ lg: 1200, md: 996, sm: 768 }}
+        // Breakpoints use the *grid container* width (main panel), not the viewport.
+        // Expanded sidebar (~248px) + padding means viewport 1280 ≈ container ~1020,
+        // so lg must be lower than 1200 or the desktop layout only appears ~1514px+.
+        breakpoints={{ lg: 880, md: 720, sm: 0 }}
         cols={{ lg: 12, md: 8, sm: 6 }}
         rowHeight={40}
         margin={[12, 12]}

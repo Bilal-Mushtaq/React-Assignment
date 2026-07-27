@@ -37,7 +37,7 @@ export function getDefaultLayouts(): ResponsiveLayouts {
   ]
 
   const md: Layout = [
-    { i: 'kpis', x: 0, y: 0, w: 8, h: 8, minW: 4, minH: 4 },
+    { i: 'kpis', x: 0, y: 0, w: 8, h: 6, minW: 4, minH: 4 },
     { i: 'cameras', x: 0, y: 5, w: 8, h: 14, minW: 4, minH: 10 },
     { i: 'alerts', x: 0, y: 19, w: 4, h: 6, minW: 3, minH: 4 },
     { i: 'incidents', x: 4, y: 19, w: 4, h: 6, minW: 3, minH: 4 },
