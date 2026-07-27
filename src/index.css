@@ -160,6 +160,33 @@ code {
   color: var(--text-h);
 }
 
+/* Interactive cursors */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+[role='radio']:not([aria-disabled='true']),
+[role='switch']:not([aria-disabled='true']),
+[role='tab']:not([aria-disabled='true']),
+[role='menuitem']:not([aria-disabled='true']),
+[role='option']:not([aria-disabled='true']),
+summary,
+label[for],
+a[href],
+input[type='file'],
+input[type='checkbox'],
+input[type='radio'],
+input[type='range'],
+input[type='color'],
+select:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled='true'],
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+}
+
 /* Focus ring utility */
 .focus-ring {
   outline: none;
