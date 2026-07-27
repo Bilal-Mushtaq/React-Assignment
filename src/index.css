@@ -213,6 +213,39 @@ select:disabled {
   animation: vigil-pulse 1.8s ease-in-out infinite;
 }
 
+/* Focus flash when jumping to a widget from sidebar / command palette.
+   Inset ring follows the card’s border-radius (outer shadows get clipped by overflow:hidden). */
+.widget-focus-flash {
+  border-radius: var(--radius) !important;
+  border-color: var(--accent) !important;
+  box-shadow:
+    inset 0 0 0 2px var(--accent),
+    inset 0 0 0 6px var(--accent-bg),
+    var(--shadow-md) !important;
+  animation: widget-focus-pulse 1.6s ease-out;
+}
+
+@keyframes widget-focus-pulse {
+  0% {
+    box-shadow:
+      inset 0 0 0 0 transparent,
+      inset 0 0 0 0 transparent,
+      var(--shadow-sm);
+  }
+  30% {
+    box-shadow:
+      inset 0 0 0 2px var(--accent),
+      inset 0 0 0 8px var(--accent-bg),
+      var(--shadow-md);
+  }
+  100% {
+    box-shadow:
+      inset 0 0 0 2px var(--accent),
+      inset 0 0 0 6px color-mix(in srgb, var(--accent-bg) 45%, transparent),
+      var(--shadow-md);
+  }
+}
+
 /* Scanline feel for camera previews */
 .camera-preview {
   background:

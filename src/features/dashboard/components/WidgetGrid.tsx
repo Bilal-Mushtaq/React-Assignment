@@ -56,6 +56,7 @@ const WidgetFrame = memo(function WidgetFrame({
 
   return (
     <section
+      data-widget-card
       aria-label={def.title}
       className={cn(
         'group/widget flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border bg-[color:var(--surface-elevated)] shadow-[var(--shadow-sm)] transition-shadow duration-200 hover:shadow-[var(--shadow-md)]',

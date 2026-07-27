@@ -1,12 +1,22 @@
 import type { WidgetId } from '../../dashboard/widgets/widgetRegistry'
+import { useUiStore } from '../../../store/uiStore'
 
 export function scrollToWidget(widgetId: WidgetId) {
+  useUiStore.getState().setActiveWidgetId(widgetId)
+
   window.setTimeout(() => {
-    const el = document.getElementById(`widget-${widgetId}`)
-    el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    el?.classList.add('ring-2', 'ring-[color:var(--accent)]')
+    const wrap = document.getElementById(`widget-${widgetId}`)
+    const card = (wrap?.querySelector('[data-widget-card]') as HTMLElement | null) ?? wrap
+    if (!card) return
+
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    card.classList.remove('widget-focus-flash')
+    // Retrigger animation if already focused
+    void card.offsetWidth
+    card.classList.add('widget-focus-flash')
+
     window.setTimeout(() => {
-      el?.classList.remove('ring-2', 'ring-[color:var(--accent)]')
-    }, 1200)
+      card.classList.remove('widget-focus-flash')
+    }, 1600)
   }, 120)
 }

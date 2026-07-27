@@ -1,5 +1,6 @@
-import { Sparkles, X } from 'lucide-react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { ChevronDown, Sparkles, X } from 'lucide-react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ActivitySquare,
@@ -15,16 +16,19 @@ import { Badge } from '../components/ui/badge'
 import { StatusDot } from '../components/ui/status-dot'
 import { scrollToWidget } from '../features/command-palette/utils/scrollToWidget'
 import type { WidgetId } from '../features/dashboard/widgets/widgetRegistry'
+import { fadeQuick, fadeSoft } from '../lib/motion'
 
-export const navItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, widgetId: null as WidgetId | null },
-  { to: '/dashboard', label: 'Cameras', icon: Camera, widgetId: 'cameras' as WidgetId },
-  { to: '/dashboard', label: 'Alerts', icon: Bell, widgetId: 'alerts' as WidgetId },
-  { to: '/dashboard', label: 'Incidents', icon: ActivitySquare, widgetId: 'incidents' as WidgetId },
-  { to: '/dashboard', label: 'Analytics', icon: PieChart, widgetId: 'analytics' as WidgetId },
-  { to: '/dashboard', label: 'Activity', icon: Sparkles, widgetId: 'activity' as WidgetId },
-  { to: '/settings', label: 'Settings', icon: SettingsIcon, widgetId: null as WidgetId | null },
-] as const
+const dashboardChildren: Array<{
+  label: string
+  icon: typeof Camera
+  widgetId: WidgetId
+}> = [
+  { label: 'Cameras', icon: Camera, widgetId: 'cameras' },
+  { label: 'Activity', icon: Sparkles, widgetId: 'activity' },
+  { label: 'Incidents', icon: ActivitySquare, widgetId: 'incidents' },
+  { label: 'Analytics', icon: PieChart, widgetId: 'analytics' },
+  { label: 'Alerts', icon: Bell, widgetId: 'alerts' },
+]
 
 type SidebarContentProps = {
   expanded: boolean
@@ -35,6 +39,31 @@ type SidebarContentProps = {
 
 export function SidebarContent({ expanded, onNavigate, showClose, onClose }: SidebarContentProps) {
   const location = useLocation()
+  const navigate = useNavigate()
+  const activeWidgetId = useUiStore((s) => s.activeWidgetId)
+  const setActiveWidgetId = useUiStore((s) => s.setActiveWidgetId)
+  const [dashboardOpen, setDashboardOpen] = useState(true)
+
+  const onDashboard = location.pathname.startsWith('/dashboard')
+  const onSettings = location.pathname.startsWith('/settings')
+
+  const goDashboard = () => {
+    setActiveWidgetId(null)
+    if (!onDashboard) navigate('/dashboard')
+    setDashboardOpen(true)
+    onNavigate?.()
+  }
+
+  const goWidget = (widgetId: WidgetId) => {
+    if (!onDashboard) {
+      navigate('/dashboard')
+      window.setTimeout(() => scrollToWidget(widgetId), 280)
+    } else {
+      scrollToWidget(widgetId)
+    }
+    setDashboardOpen(true)
+    onNavigate?.()
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -60,7 +89,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                transition={fadeSoft}
                 className="min-w-0 overflow-hidden"
               >
                 <div className="truncate text-md font-bold tracking-tight text-[color:var(--text-h)]">Vigil</div>
@@ -85,10 +114,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
       </div>
 
       <nav
-        className={cn(
-          'min-h-0 flex-1 space-y-0.5 overflow-y-auto py-2',
-          expanded ? 'px-2' : 'px-1.5',
-        )}
+        className={cn('min-h-0 flex-1 space-y-1 overflow-y-auto py-2', expanded ? 'px-2' : 'px-1.5')}
         aria-label="Sidebar navigation"
       >
         <AnimatePresence initial={false}>
@@ -98,7 +124,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.15 }}
+              transition={fadeQuick}
               className="overflow-hidden px-2 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]"
             >
               Operations
@@ -106,66 +132,191 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
           ) : null}
         </AnimatePresence>
 
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isSettings = item.to === '/settings'
-          const isActiveRoute = isSettings
-            ? location.pathname.startsWith('/settings')
-            : location.pathname.startsWith('/dashboard') && item.label === 'Dashboard'
-
-          return (
-            <NavLink
-              key={item.label}
-              to={item.to}
-              title={expanded ? undefined : item.label}
-              onClick={(e) => {
-                if (item.widgetId && location.pathname.startsWith('/dashboard')) {
-                  e.preventDefault()
-                  scrollToWidget(item.widgetId)
-                }
-                onNavigate?.()
-              }}
+        {/* Dashboard parent + widget children */}
+        <div className={cn(expanded && dashboardOpen && onDashboard && 'rounded-2xl bg-[color:var(--surface-muted)]/55 p-1')}>
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              title={expanded ? undefined : 'Dashboard'}
+              aria-label="Dashboard"
+              onClick={goDashboard}
               className={cn(
-                'group relative flex items-center rounded-xl text-sm font-medium outline-none transition-all focus-ring',
+                'group relative flex min-w-0 flex-1 items-center rounded-xl text-sm font-medium outline-none transition-all duration-300 ease-out focus-ring',
                 expanded ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
-                isActiveRoute
+                onDashboard && !activeWidgetId
                   ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
-                  : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+                  : onDashboard
+                    ? 'text-[color:var(--text-h)]'
+                    : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
               )}
             >
-              {!expanded && isActiveRoute ? (
+              {!expanded && onDashboard && !activeWidgetId ? (
                 <span
                   className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
                   aria-hidden="true"
                 />
               ) : null}
-
-              <Icon
+              <LayoutDashboard
                 size={18}
                 className={cn(
-                  'shrink-0 transition-colors',
-                  isActiveRoute ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+                  'shrink-0 transition-colors duration-300 ease-out',
+                  onDashboard && !activeWidgetId
+                    ? 'text-[color:var(--accent)]'
+                    : onDashboard
+                      ? 'text-[color:var(--text-h)]'
+                      : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
                 )}
                 aria-hidden="true"
               />
+              {expanded ? <span className="truncate">Dashboard</span> : null}
+            </button>
 
-              <AnimatePresence initial={false}>
-                {expanded ? (
-                  <motion.span
-                    key="label"
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                    className="truncate overflow-hidden whitespace-nowrap"
+            {expanded ? (
+              <button
+                type="button"
+                className="rounded-lg p-2 text-[color:var(--text-muted)] transition hover:bg-black/5 hover:text-[color:var(--text-h)] focus-ring"
+                aria-expanded={dashboardOpen}
+                aria-label={dashboardOpen ? 'Collapse dashboard widgets' : 'Expand dashboard widgets'}
+                onClick={() => setDashboardOpen((v) => !v)}
+              >
+                <ChevronDown
+                  size={16}
+                  className={cn('transition-transform duration-300 ease-out', dashboardOpen ? 'rotate-0' : '-rotate-90')}
+                />
+              </button>
+            ) : null}
+          </div>
+
+          {/* Expanded: nested tree. Collapsed: icon stack under Dashboard. */}
+          <AnimatePresence initial={false}>
+            {expanded && dashboardOpen ? (
+              <motion.div
+                key="dashboard-children-expanded"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
+              >
+                <div
+                  className="relative ml-4 mt-0.5 space-y-0.5 border-l border-[color:var(--border)] py-1 pl-2"
+                  role="group"
+                  aria-label="Dashboard widgets"
+                >
+                  {dashboardChildren.map((item) => {
+                    const Icon = item.icon
+                    const active = onDashboard && activeWidgetId === item.widgetId
+                    return (
+                      <button
+                        key={item.widgetId}
+                        type="button"
+                        onClick={() => goWidget(item.widgetId)}
+                        className={cn(
+                          'group relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] font-medium outline-none transition-all duration-300 ease-out focus-ring',
+                          active
+                            ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+                            : 'text-[color:var(--text)] hover:bg-[color:var(--surface-elevated)] hover:text-[color:var(--text-h)]',
+                        )}
+                      >
+                        {active ? (
+                          <span
+                            className="absolute -left-[9px] top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                        <Icon
+                          size={15}
+                          className={cn(
+                            'shrink-0 transition-colors',
+                            active
+                              ? 'text-[color:var(--accent)]'
+                              : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+
+          {!expanded ? (
+            <div className="mt-0.5 space-y-0.5" role="group" aria-label="Dashboard widgets">
+              {dashboardChildren.map((item) => {
+                const Icon = item.icon
+                const active = onDashboard && activeWidgetId === item.widgetId
+                return (
+                  <button
+                    key={item.widgetId}
+                    type="button"
+                    title={item.label}
+                    aria-label={item.label}
+                    onClick={() => goWidget(item.widgetId)}
+                    className={cn(
+                      'group relative flex w-full items-center justify-center rounded-xl p-2.5 outline-none transition-all duration-300 ease-out focus-ring',
+                      active
+                        ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+                        : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+                    )}
                   >
-                    {item.label}
-                  </motion.span>
-                ) : null}
-              </AnimatePresence>
-            </NavLink>
-          )
-        })}
+                    {active ? (
+                      <span
+                        className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <Icon
+                      size={18}
+                      className={cn(
+                        'shrink-0 transition-colors',
+                        active
+                          ? 'text-[color:var(--accent)]'
+                          : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+                      )}
+                      aria-hidden="true"
+                    />
+                  </button>
+                )
+              })}
+            </div>
+          ) : null}
+        </div>
+
+        {/* Settings */}
+        <NavLink
+          to="/settings"
+          title={expanded ? undefined : 'Settings'}
+          onClick={() => {
+            setActiveWidgetId(null)
+            onNavigate?.()
+          }}
+          className={cn(
+            'group relative flex items-center rounded-xl text-sm font-medium outline-none transition-all duration-300 ease-out focus-ring',
+            expanded ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
+            onSettings
+              ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+              : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+          )}
+        >
+          {!expanded && onSettings ? (
+            <span
+              className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+              aria-hidden="true"
+            />
+          ) : null}
+          <SettingsIcon
+            size={18}
+            className={cn(
+              'shrink-0 transition-colors duration-300 ease-out',
+              onSettings ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+            )}
+            aria-hidden="true"
+          />
+          {expanded ? <span className="truncate">Settings</span> : null}
+        </NavLink>
       </nav>
 
       <AnimatePresence initial={false}>
@@ -175,7 +326,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            transition={fadeSoft}
             className="mt-auto shrink-0 border-t border-[color:var(--border)] bg-[color:var(--surface)] p-3"
           >
             <div className="rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-3">
@@ -197,7 +348,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={fadeQuick}
             className="mt-auto shrink-0 border-t border-[color:var(--border)] p-3"
           >
             <div className="flex justify-center" title="System live">
