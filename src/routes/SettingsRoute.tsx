@@ -32,7 +32,16 @@ const MODE_OPTIONS: Array<{
   },
 ]
 
-const ACCENT_PRESETS = ['#0f766e', '#0284c7', '#7c3aed', '#db2777', '#ea580c', '#059669'] as const
+const ACCENT_PRESETS = ['#0f766e', '#0d9488', '#0284c7', '#0369a1', '#059669', '#d97706'] as const
+
+function SectionTitle({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="mb-3 border-b border-[color:var(--border)] pb-2.5">
+      <h3 className="text-[13px] font-semibold text-[color:var(--text-h)]">{title}</h3>
+      <p className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">{description}</p>
+    </div>
+  )
+}
 
 export default function SettingsRoute() {
   const ready = usePageReady()
@@ -59,15 +68,11 @@ export default function SettingsRoute() {
 
   return (
     <div className="w-full space-y-4 pb-8" aria-label="Settings">
-      <header className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm">
+      <header className="flex flex-wrap items-end justify-between items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-bold tracking-tight text-[color:var(--text-h)]">Settings</h2>
-            <Badge tone="accent">Appearance</Badge>
-          </div>
-          <p className="mt-1 text-xs leading-relaxed text-[color:var(--text-muted)]">
-            Customize theme mode, accent, typography, and layout density. Changes apply instantly and persist in
-            local storage.
+          <h2 className="text-lg font-bold tracking-tight text-[color:var(--text-h)]">Appearance</h2>
+          <p className="mt-0.5 text-xs text-[color:var(--text-muted)]">
+            Theme, accent, and density — changes apply instantly
           </p>
         </div>
 
@@ -80,20 +85,12 @@ export default function SettingsRoute() {
           aria-label="Reset appearance settings to defaults"
         >
           <RotateCcw size={14} />
-          Reset to defaults
+          Reset defaults
         </Button>
       </header>
 
       <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
-        <div className="mb-3 flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[color:var(--accent-bg)] text-[color:var(--accent)]">
-            <Monitor size={14} aria-hidden="true" />
-          </span>
-          <div>
-            <h3 className="text-[13px] font-semibold text-[color:var(--text-h)]">Theme mode</h3>
-            <p className="text-[11px] text-[color:var(--text-muted)]">Choose how Vigil renders across screens</p>
-          </div>
-        </div>
+        <SectionTitle title="Theme mode" description="Choose how Vigil renders across screens" />
 
         <div className="grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Theme mode">
           {MODE_OPTIONS.map((option) => {
@@ -113,19 +110,16 @@ export default function SettingsRoute() {
                     : 'border-[color:var(--border)] bg-[color:var(--surface-muted)]/40 hover:border-[color:var(--border-strong)] hover:bg-[color:var(--surface-muted)]',
                 )}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span
-                    className={cn(
-                      'flex h-8 w-8 items-center justify-center rounded-lg transition',
-                      selected
-                        ? 'bg-[color:var(--accent)] text-[color:var(--accent-fg)]'
-                        : 'bg-[color:var(--surface-elevated)] text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
-                    )}
-                  >
-                    <Icon size={15} aria-hidden="true" />
-                  </span>
-                  {selected ? <Badge tone="accent">Active</Badge> : null}
-                </div>
+                <span
+                  className={cn(
+                    'flex h-8 w-8 items-center justify-center rounded-lg transition',
+                    selected
+                      ? 'bg-[color:var(--accent)] text-[color:var(--accent-fg)]'
+                      : 'bg-[color:var(--surface-elevated)] text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+                  )}
+                >
+                  <Icon size={15} aria-hidden="true" />
+                </span>
                 <div className="mt-2.5 text-[13px] font-semibold text-[color:var(--text-h)]">{option.label}</div>
                 <p className="mt-0.5 text-[11px] leading-relaxed text-[color:var(--text-muted)]">{option.description}</p>
               </button>
@@ -136,15 +130,7 @@ export default function SettingsRoute() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
-          <div className="mb-3 flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[color:var(--accent-bg)] text-[color:var(--accent)]">
-              <Palette size={14} aria-hidden="true" />
-            </span>
-            <div>
-              <h3 className="text-[13px] font-semibold text-[color:var(--text-h)]">Accent color</h3>
-              <p className="text-[11px] text-[color:var(--text-muted)]">Brand highlight used across controls</p>
-            </div>
-          </div>
+          <SectionTitle title="Accent color" description="Brand highlight used across controls" />
 
           <div className="flex flex-wrap items-center gap-2">
             {ACCENT_PRESETS.map((preset) => {
@@ -157,14 +143,17 @@ export default function SettingsRoute() {
                   aria-pressed={selected}
                   onClick={() => setAccent(preset)}
                   className={cn(
-                    'h-8 w-8 rounded-full border-2 transition focus-ring',
-                    selected ? 'border-[color:var(--text-h)] scale-110' : 'border-transparent hover:scale-105',
+                    'h-8 w-8 rounded-lg border-2 transition focus-ring',
+                    selected
+                      ? 'border-[color:var(--text-h)] shadow-[0_0_0_2px_var(--surface),0_0_0_4px_var(--accent-border)]'
+                      : 'border-transparent hover:border-[color:var(--border-strong)]',
                   )}
                   style={{ backgroundColor: preset }}
                 />
               )
             })}
             <label className="relative ml-1 inline-flex h-8 cursor-pointer items-center gap-2 rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-muted)]/50 px-2.5 text-xs font-medium text-[color:var(--text-h)] transition hover:bg-[color:var(--surface-muted)]">
+              <Palette size={12} aria-hidden="true" />
               Custom
               <input
                 type="color"
@@ -174,7 +163,7 @@ export default function SettingsRoute() {
                 onChange={(e) => setAccent(e.target.value)}
               />
               <span
-                className="h-3.5 w-3.5 rounded-full border border-[color:var(--border)]"
+                className="h-3.5 w-3.5 rounded-md border border-[color:var(--border)]"
                 style={{ backgroundColor: accent }}
                 aria-hidden="true"
               />
@@ -199,15 +188,7 @@ export default function SettingsRoute() {
         </section>
 
         <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
-          <div className="mb-3 flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[color:var(--accent-bg)] text-[color:var(--accent)]">
-              <PanelLeft size={14} aria-hidden="true" />
-            </span>
-            <div>
-              <h3 className="text-[13px] font-semibold text-[color:var(--text-h)]">Sidebar</h3>
-              <p className="text-[11px] text-[color:var(--text-muted)]">Default desktop navigation width</p>
-            </div>
-          </div>
+          <SectionTitle title="Sidebar" description="Default desktop navigation width" />
 
           <button
             type="button"
@@ -221,11 +202,14 @@ export default function SettingsRoute() {
                 : 'border-[color:var(--border)] bg-[color:var(--surface-muted)]/40 hover:bg-[color:var(--surface-muted)]',
             )}
           >
-            <div>
-              <div className="text-[13px] font-semibold text-[color:var(--text-h)]">Expanded sidebar</div>
-              <p className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
-                {sidebarExpanded ? 'Labels and system status are visible.' : 'Icon-only compact navigation.'}
-              </p>
+            <div className="flex items-start gap-2.5">
+              <PanelLeft size={16} className="mt-0.5 text-[color:var(--accent)]" aria-hidden="true" />
+              <div>
+                <div className="text-[13px] font-semibold text-[color:var(--text-h)]">Expanded sidebar</div>
+                <p className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
+                  {sidebarExpanded ? 'Labels and system status are visible.' : 'Icon-only compact navigation.'}
+                </p>
+              </div>
             </div>
             <span
               className={cn(
@@ -246,19 +230,12 @@ export default function SettingsRoute() {
       </div>
 
       <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
-        <div className="mb-4 flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[color:var(--accent-bg)] text-[color:var(--accent)]">
-            <Type size={14} aria-hidden="true" />
-          </span>
-          <div>
-            <h3 className="text-[13px] font-semibold text-[color:var(--text-h)]">Density & radius</h3>
-            <p className="text-[11px] text-[color:var(--text-muted)]">Live adjustments — no apply step needed</p>
-          </div>
-        </div>
+        <SectionTitle title="Density & radius" description="Live adjustments — no apply step needed" />
 
         <div className="grid gap-4 lg:grid-cols-2">
           <label className="block rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]/35 p-3.5">
             <div className="mb-3 flex items-center gap-2">
+              <Type size={14} className="text-[color:var(--accent)]" aria-hidden="true" />
               <span className="mono rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-elevated)] px-2 py-1 text-[11px] font-medium text-[color:var(--text-h)]">
                 {baseFontSize}px
               </span>

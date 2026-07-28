@@ -3,11 +3,11 @@ import { cn } from '../../lib/cn'
 type Status = 'online' | 'offline' | 'degraded' | 'recording' | 'live'
 
 const colors: Record<Status, string> = {
-  online: 'bg-emerald-500',
-  recording: 'bg-emerald-500',
-  live: 'bg-emerald-500',
-  degraded: 'bg-amber-500',
-  offline: 'bg-rose-500',
+  online: 'bg-[color:var(--success)]',
+  live: 'bg-[color:var(--success)]',
+  recording: 'bg-[color:var(--danger)]',
+  degraded: 'bg-[color:var(--warning)]',
+  offline: 'bg-[color:var(--danger)]',
 }
 
 export function StatusDot({

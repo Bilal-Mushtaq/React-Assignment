@@ -5,7 +5,6 @@ import { useDashboardStore } from '../../../store/dashboardStore'
 import { widgetDefinitions, type WidgetId } from '../widgets/widgetRegistry'
 import { cn } from '../../../lib/cn'
 import { normalizeLayouts } from '../utils/normalizeLayouts'
-import { Badge } from '../../../components/ui/badge'
 
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
@@ -84,7 +83,6 @@ const WidgetFrame = memo(function WidgetFrame({
           <span className="truncate text-[13px] font-semibold tracking-tight text-[color:var(--text-h)]">
             {def.title}
           </span>
-          {pinned ? <Badge tone="accent">Pinned</Badge> : null}
         </div>
 
         <div className="flex items-center gap-0.5">
@@ -93,8 +91,8 @@ const WidgetFrame = memo(function WidgetFrame({
             className={cn(
               'rounded-lg p-1.5 transition focus-ring',
               pinned
-                ? 'text-amber-500 hover:bg-amber-500/10'
-                : 'text-[color:var(--text-muted)] hover:bg-black/5 hover:text-[color:var(--text-h)]',
+                ? 'text-[color:var(--warning)] hover:bg-[color:color-mix(in_srgb,var(--warning)_12%,transparent)]'
+                : 'text-[color:var(--text-muted)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
             )}
             onClick={() => onTogglePinned(widgetId)}
             aria-label={pinned ? 'Unpin widget (allow drag and resize)' : 'Pin widget (lock position)'}
@@ -105,7 +103,7 @@ const WidgetFrame = memo(function WidgetFrame({
 
           <button
             type="button"
-            className="rounded-lg p-1.5 text-[color:var(--text-muted)] transition hover:bg-black/5 hover:text-[color:var(--text-h)] focus-ring"
+            className="rounded-lg p-1.5 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
             onClick={() => onToggleCollapse(widgetId)}
             aria-label={collapsed ? 'Expand widget' : 'Collapse widget'}
           >
@@ -125,7 +123,17 @@ const WidgetFrame = memo(function WidgetFrame({
           <Content />
         </div>
       ) : (
-        <div className="px-3 py-2 text-[11px] text-[color:var(--text-muted)]">Collapsed</div>
+        <div className="flex items-center gap-2 px-3 py-2 text-[11px] text-[color:var(--text-muted)]">
+          <span className="font-medium text-[color:var(--text)]">{def.title}</span>
+          <span aria-hidden="true">·</span>
+          <span>Collapsed</span>
+          {pinned ? (
+            <>
+              <span aria-hidden="true">·</span>
+              <span className="text-[color:var(--warning)]">Pinned</span>
+            </>
+          ) : null}
+        </div>
       )}
     </section>
   )

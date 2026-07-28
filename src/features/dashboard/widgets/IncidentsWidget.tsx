@@ -2,6 +2,15 @@ import { useMemo } from 'react'
 import { useTimelineStore } from '../../../store/timelineStore'
 import { formatRelativeTime, severityTone } from '../../../utils/format'
 import { Badge } from '../../../components/ui/badge'
+import { cn } from '../../../lib/cn'
+import type { AlertSeverity } from '../../../types/domain'
+
+const spineColor: Record<AlertSeverity, string> = {
+  critical: 'bg-[color:var(--danger)] ring-[color:color-mix(in_srgb,var(--danger)_20%,transparent)]',
+  high: 'bg-[color:var(--warning)] ring-[color:color-mix(in_srgb,var(--warning)_20%,transparent)]',
+  medium: 'bg-[color:var(--info)] ring-[color:color-mix(in_srgb,var(--info)_20%,transparent)]',
+  low: 'bg-[color:var(--success)] ring-[color:color-mix(in_srgb,var(--success)_20%,transparent)]',
+}
 
 export function IncidentsWidget() {
   const allIncidents = useTimelineStore((s) => s.incidents)
@@ -9,6 +18,11 @@ export function IncidentsWidget() {
 
   return (
     <div className="flex h-full min-h-0 flex-col" aria-label="Incident timeline widget">
+      <div className="mb-1.5 flex shrink-0 items-center justify-between text-[11px] text-[color:var(--text-muted)]">
+        <span className="font-medium text-[color:var(--text)]">Recent timeline</span>
+        <span className="mono tabular-nums text-[color:var(--text-h)]">{incidents.length}</span>
+      </div>
+
       <div className="widget-scroll min-h-0 flex-1 space-y-2 overflow-auto">
         {incidents.length === 0 ? (
           <div className="flex h-full min-h-[120px] flex-col items-center justify-center rounded-xl border border-dashed border-[color:var(--border)] bg-[color:var(--surface-muted)]/40 px-4 text-center">
@@ -19,7 +33,9 @@ export function IncidentsWidget() {
           incidents.map((incident, index) => (
             <div key={incident.id} className="relative flex gap-3 pl-1">
               <div className="relative flex w-3 shrink-0 flex-col items-center">
-                <span className="mt-1.5 h-2 w-2 rounded-full bg-[color:var(--accent)] ring-4 ring-[color:var(--accent-bg)]" />
+                <span
+                  className={cn('mt-1.5 h-2 w-2 rounded-full ring-4', spineColor[incident.severity] ?? spineColor.medium)}
+                />
                 {index < incidents.length - 1 ? (
                   <span className="mt-1 w-px flex-1 bg-[color:var(--border)]" aria-hidden="true" />
                 ) : null}

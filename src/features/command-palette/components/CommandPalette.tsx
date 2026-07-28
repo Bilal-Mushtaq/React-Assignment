@@ -4,30 +4,38 @@ import {
   AlertTriangle,
   Camera,
   LayoutDashboard,
+  Monitor,
   Moon,
-  PanelTop,
+  Radio,
   Search,
   Settings,
   Sun,
+  Zap,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useCommandPaletteStore } from '../../../store/commandPaletteStore'
 import { useCommandPaletteShortcut } from '../hooks/useCommandPaletteShortcut'
 import { useCommandSearch } from '../hooks/useCommandSearch'
-import type { CommandCategory, CommandItem } from '../types'
+import type { CommandItem } from '../types'
 
-function categoryIcon(category: CommandCategory) {
-  switch (category) {
+function itemIcon(item: CommandItem) {
+  if (item.id.includes('dark') || item.title.toLowerCase().includes('dark')) return Moon
+  if (item.id.includes('light') || item.title.toLowerCase().includes('light')) return Sun
+  if (item.id.includes('system') || item.title.toLowerCase().includes('system')) return Monitor
+  if (item.id.includes('settings') || item.title.toLowerCase().includes('settings')) return Settings
+  if (item.category === 'widget' && item.id.includes('activity')) return Radio
+
+  switch (item.category) {
     case 'navigation':
       return LayoutDashboard
     case 'widget':
-      return PanelTop
+      return Zap
     case 'camera':
       return Camera
     case 'alert':
       return AlertTriangle
     case 'action':
-      return Sun
+      return Zap
     default:
       return Search
   }
@@ -44,29 +52,29 @@ function CommandResultRow({
   onSelect: () => void
   onHover: () => void
 }) {
-  const Icon = categoryIcon(item.category)
+  const Icon = itemIcon(item)
 
   return (
     <button
       type="button"
       role="option"
       aria-selected={active}
-        className={[
-          'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition',
-          active
-            ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
-            : 'text-[color:var(--text-h)] hover:bg-[color:var(--surface-muted)]',
-        ].join(' ')}
+      className={[
+        'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition',
+        active
+          ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+          : 'text-[color:var(--text-h)] hover:bg-[color:var(--surface-muted)]',
+      ].join(' ')}
       onMouseEnter={onHover}
       onClick={onSelect}
     >
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--border)] bg-black/5">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[color:var(--border)] bg-[color:var(--surface-muted)] text-[color:var(--text-muted)]">
         <Icon size={16} aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium">{item.title}</span>
         {item.subtitle ? (
-          <span className="block truncate text-xs text-[color:var(--text)]">{item.subtitle}</span>
+          <span className="block truncate text-xs text-[color:var(--text-muted)]">{item.subtitle}</span>
         ) : null}
       </span>
     </button>
@@ -135,14 +143,14 @@ export function CommandPalette() {
           </VisuallyHidden.Root>
 
           <div className="flex items-center gap-2 border-b border-[color:var(--border)] px-4 py-3">
-            <Search size={18} className="shrink-0 text-[color:var(--text)]" aria-hidden="true" />
+            <Search size={18} className="shrink-0 text-[color:var(--text-muted)]" aria-hidden="true" />
             <input
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={onInputKeyDown}
               placeholder="Search cameras, alerts, widgets, actions…"
-              className="w-full bg-transparent text-sm text-[color:var(--text-h)] outline-none placeholder:text-[color:var(--text)]"
+              className="w-full bg-transparent text-sm text-[color:var(--text-h)] outline-none placeholder:text-[color:var(--text-muted)]"
               aria-label="Search command palette"
               role="combobox"
               aria-expanded="true"
@@ -151,7 +159,7 @@ export function CommandPalette() {
               autoComplete="off"
               spellCheck={false}
             />
-            <kbd className="hidden rounded border border-[color:var(--border)] px-1.5 py-0.5 text-[10px] text-[color:var(--text)] sm:inline">
+            <kbd className="mono hidden rounded border border-[color:var(--border)] bg-[color:var(--surface-muted)] px-1.5 py-0.5 text-[10px] text-[color:var(--text-muted)] sm:inline">
               Esc
             </kbd>
           </div>
@@ -163,13 +171,13 @@ export function CommandPalette() {
             className="max-h-[min(420px,55vh)] overflow-y-auto p-2"
           >
             {total === 0 ? (
-              <div className="px-3 py-10 text-center text-sm text-[color:var(--text)]">
+              <div className="px-3 py-10 text-center text-sm text-[color:var(--text-muted)]">
                 No results for &ldquo;{query}&rdquo;
               </div>
             ) : (
               groups.map((group) => (
                 <div key={group.label} className="mb-2">
-                  <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[color:var(--text)]">
+                  <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
                     {group.label}
                   </div>
                   <div className="space-y-0.5">
@@ -192,22 +200,23 @@ export function CommandPalette() {
             )}
           </div>
 
-          <div className="flex items-center justify-between border-t border-[color:var(--border)] px-4 py-2 text-[10px] text-[color:var(--text)]">
-            <span>{total} result{total === 1 ? '' : 's'}</span>
+          <div className="flex items-center justify-between border-t border-[color:var(--border)] px-4 py-2 text-[10px] text-[color:var(--text-muted)]">
+            <span className="mono tabular-nums">
+              {total} result{total === 1 ? '' : 's'}
+            </span>
             <span className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1">
-                <kbd className="rounded border border-[color:var(--border)] px-1">↑</kbd>
-                <kbd className="rounded border border-[color:var(--border)] px-1">↓</kbd>
+                <kbd className="rounded border border-[color:var(--border)] bg-[color:var(--surface-muted)] px-1">↑</kbd>
+                <kbd className="rounded border border-[color:var(--border)] bg-[color:var(--surface-muted)] px-1">↓</kbd>
                 navigate
               </span>
               <span className="inline-flex items-center gap-1">
-                <kbd className="rounded border border-[color:var(--border)] px-1">↵</kbd>
+                <kbd className="rounded border border-[color:var(--border)] bg-[color:var(--surface-muted)] px-1">↵</kbd>
                 select
               </span>
               <span className="inline-flex items-center gap-1">
-                <Moon size={10} aria-hidden="true" />
-                <Settings size={10} aria-hidden="true" />
-                actions
+                <kbd className="rounded border border-[color:var(--border)] bg-[color:var(--surface-muted)] px-1">Esc</kbd>
+                close
               </span>
             </span>
           </div>

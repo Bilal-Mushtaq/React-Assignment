@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Sparkles, X } from 'lucide-react'
+import { ChevronDown, Radio, Sparkles, X } from 'lucide-react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { cn } from '../lib/cn'
 import { useUiStore } from '../store/uiStore'
+import { useAlertsStore } from '../store/alertsStore'
 import { Badge } from '../components/ui/badge'
 import { StatusDot } from '../components/ui/status-dot'
 import { scrollToWidget } from '../features/command-palette/utils/scrollToWidget'
@@ -24,7 +25,7 @@ const dashboardChildren: Array<{
   widgetId: WidgetId
 }> = [
   { label: 'Cameras', icon: Camera, widgetId: 'cameras' },
-  { label: 'Activity', icon: Sparkles, widgetId: 'activity' },
+  { label: 'Activity', icon: Radio, widgetId: 'activity' },
   { label: 'Incidents', icon: ActivitySquare, widgetId: 'incidents' },
   { label: 'Analytics', icon: PieChart, widgetId: 'analytics' },
   { label: 'Alerts', icon: Bell, widgetId: 'alerts' },
@@ -42,6 +43,9 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
   const navigate = useNavigate()
   const activeWidgetId = useUiStore((s) => s.activeWidgetId)
   const setActiveWidgetId = useUiStore((s) => s.setActiveWidgetId)
+  const activeAlerts = useAlertsStore(
+    (s) => s.alerts.filter((a) => a.status !== 'resolved').length,
+  )
   const [dashboardOpen, setDashboardOpen] = useState(true)
 
   const onDashboard = location.pathname.startsWith('/dashboard')
@@ -66,7 +70,12 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="relative flex h-full flex-col">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 w-0.5 bg-[color:var(--accent)]/35"
+      />
+
       <div
         className={cn(
           'flex shrink-0 items-center border-b border-[color:var(--border)]',
@@ -104,7 +113,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
         {showClose ? (
           <button
             type="button"
-            className="rounded-lg p-2 text-[color:var(--text-h)] hover:bg-black/5 lg:hidden focus-ring"
+            className="rounded-lg p-2 text-[color:var(--text-h)] transition hover:bg-[color:var(--surface-muted)] lg:hidden focus-ring"
             onClick={onClose}
             aria-label="Close navigation menu"
           >
@@ -132,7 +141,6 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
           ) : null}
         </AnimatePresence>
 
-        {/* Dashboard parent + widget children */}
         <div className={cn(expanded && dashboardOpen && onDashboard && 'rounded-2xl bg-[color:var(--surface-muted)]/55 p-1')}>
           <div className="flex items-center gap-0.5">
             <button
@@ -174,7 +182,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
             {expanded ? (
               <button
                 type="button"
-                className="rounded-lg p-2 text-[color:var(--text-muted)] transition hover:bg-black/5 hover:text-[color:var(--text-h)] focus-ring"
+                className="rounded-lg p-2 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
                 aria-expanded={dashboardOpen}
                 aria-label={dashboardOpen ? 'Collapse dashboard widgets' : 'Expand dashboard widgets'}
                 onClick={() => setDashboardOpen((v) => !v)}
@@ -187,7 +195,6 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
             ) : null}
           </div>
 
-          {/* Expanded: nested tree. Collapsed: icon stack under Dashboard. */}
           <AnimatePresence initial={false}>
             {expanded && dashboardOpen ? (
               <motion.div
@@ -214,7 +221,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
                         className={cn(
                           'group relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] font-medium outline-none transition-all duration-300 ease-out focus-ring',
                           active
-                            ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+                            ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)]'
                             : 'text-[color:var(--text)] hover:bg-[color:var(--surface-elevated)] hover:text-[color:var(--text-h)]',
                         )}
                       >
@@ -258,7 +265,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
                     className={cn(
                       'group relative flex w-full items-center justify-center rounded-xl p-2.5 outline-none transition-all duration-300 ease-out focus-ring',
                       active
-                        ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+                        ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)]'
                         : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
                     )}
                   >
@@ -285,7 +292,6 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
           ) : null}
         </div>
 
-        {/* Settings */}
         <NavLink
           to="/settings"
           title={expanded ? undefined : 'Settings'}
@@ -351,7 +357,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
             transition={fadeQuick}
             className="mt-auto shrink-0 border-t border-[color:var(--border)] p-3"
           >
-            <div className="flex justify-center" title="System live">
+            <div className="flex justify-center" title={`${activeAlerts} open alerts · system live`}>
               <span className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]">
                 <StatusDot status="live" pulse />
               </span>
@@ -377,7 +383,7 @@ export function MobileSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px] lg:hidden"
+            className="fixed inset-0 z-40 bg-[color:color-mix(in_srgb,var(--bg)_40%,black)] backdrop-blur-[2px] lg:hidden"
             aria-label="Close navigation menu"
             onClick={closeMobileNav}
           />

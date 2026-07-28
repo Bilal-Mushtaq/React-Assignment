@@ -28,7 +28,7 @@ export const defaultPinnedWidgetIds: WidgetId[] = []
 
 export function getDefaultLayouts(): ResponsiveLayouts {
   const lg: Layout = [
-    { i: 'kpis', x: 0, y: 0, w: 3, h: 6, minW: 2, minH: 5 },
+    { i: 'kpis', x: 0, y: 0, w: 3, h: 5, minW: 2, minH: 5 },
     { i: 'cameras', x: 3, y: 0, w: 6, h: 16, minW: 3, minH: 10 },
     { i: 'activity', x: 9, y: 0, w: 3, h: 11, minW: 2, minH: 5 },
     { i: 'incidents', x: 0, y: 6, w: 3, h: 9, minW: 2, minH: 5 },

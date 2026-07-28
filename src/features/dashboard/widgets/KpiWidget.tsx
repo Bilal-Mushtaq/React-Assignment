@@ -9,21 +9,21 @@ const KPI_META = [
     label: 'Active Alerts',
     suffix: '',
     icon: ShieldAlert,
-    tone: 'text-rose-500 bg-rose-500/10',
+    tone: 'text-[color:var(--danger)] bg-[color:color-mix(in_srgb,var(--danger)_12%,transparent)]',
   },
   {
     key: 'camerasOnline' as const,
     label: 'Cameras Online',
     suffix: '',
     icon: Camera,
-    tone: 'text-emerald-500 bg-emerald-500/10',
+    tone: 'text-[color:var(--success)] bg-[color:color-mix(in_srgb,var(--success)_12%,transparent)]',
   },
   {
     key: 'incidentsToday' as const,
     label: 'Incidents Today',
     suffix: '',
     icon: Activity,
-    tone: 'text-amber-500 bg-amber-500/10',
+    tone: 'text-[color:var(--warning)] bg-[color:color-mix(in_srgb,var(--warning)_12%,transparent)]',
   },
   {
     key: 'avgAiConfidence' as const,
@@ -47,21 +47,27 @@ export function KpiWidget() {
       {KPI_META.map((item) => {
         const Icon = item.icon
         const value = kpis[item.key]
+        const isZero = value === 0
         return (
           <div
             key={item.key}
             className="relative overflow-hidden rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]/70 p-3 transition hover:border-[color:var(--border-strong)]"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', item.tone)}>
-                <Icon size={14} aria-hidden="true" />
-              </div>
-            </div>
-            <div className="mt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-              {item.label}
-            </div>
-            <div className="mt-1 text-xl font-bold tabular-nums tracking-tight text-[color:var(--text-h)]">
+            <div
+              className={cn(
+                'text-xl font-bold tabular-nums tracking-tight',
+                isZero ? 'text-[color:var(--text-muted)]' : 'text-[color:var(--text-h)]',
+              )}
+            >
               <AnimatedCounter value={value} suffix={item.suffix} />
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <div className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-md', item.tone)}>
+                <Icon size={12} aria-hidden="true" />
+              </div>
+              <div className="min-w-0 text-[10px] font-semibold uppercase leading-tight tracking-[0.1em] text-[color:var(--text-muted)]">
+                {item.label}
+              </div>
             </div>
           </div>
         )

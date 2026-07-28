@@ -1,15 +1,26 @@
 import { Menu, Moon, PanelLeft, Search, Settings as SettingsIcon, Sun } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { NotificationPanel } from '../features/notifications/components/NotificationPanel'
-import { Badge } from '../components/ui/badge'
-import { StatusDot } from '../components/ui/status-dot'
 import { useCommandPaletteStore } from '../store/commandPaletteStore'
 import { useThemeStore } from '../store/themeStore'
 import { useUiStore } from '../store/uiStore'
 import { useActivityStore } from '../store/activityStore'
 import { cn } from '../lib/cn'
 
-export function TopNavBar({ title }: { title?: string }) {
+function isApplePlatform() {
+  if (typeof navigator === 'undefined') return false
+  const platform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform
+  const source = platform ?? navigator.platform ?? navigator.userAgent
+  return /Mac|iPhone|iPad|iPod/i.test(source)
+}
+
+const PAGE_META: Record<string, { eyebrow: string; title: string }> = {
+  '/dashboard': { eyebrow: 'Operations', title: 'Dashboard' },
+  '/settings': { eyebrow: 'Preferences', title: 'Settings' },
+}
+
+export function TopNavBar() {
+  const location = useLocation()
   const openPalette = useCommandPaletteStore((s) => s.openPalette)
   const toggleMobileNav = useUiStore((s) => s.toggleMobileNav)
   const sidebarExpanded = useThemeStore((s) => s.sidebarExpanded)
@@ -24,9 +35,15 @@ export function TopNavBar({ title }: { title?: string }) {
 
   const toggleTheme = () => setMode(isDark ? 'light' : 'dark')
 
+  const meta =
+    Object.entries(PAGE_META).find(([path]) => location.pathname.startsWith(path))?.[1] ??
+    PAGE_META['/dashboard']
+
+  const shortcut = isApplePlatform() ? '⌘K' : 'Ctrl+K'
+
   return (
     <header
-      className="z-30 flex h-14 shrink-0 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface-muted)]/60 px-4 lg:px-5"
+      className="z-30 flex h-14 shrink-0 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)]/80 px-4 backdrop-blur-sm lg:px-5"
       aria-label="Top navigation"
     >
       <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
@@ -55,18 +72,10 @@ export function TopNavBar({ title }: { title?: string }) {
         <div className="hidden h-5 w-px bg-[color:var(--border)] lg:block" aria-hidden="true" />
 
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-              Command Center
-            </span>
-            <Badge tone="success" className="hidden sm:inline-flex">
-              <StatusDot status="live" pulse />
-              Streaming
-            </Badge>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+            {meta.eyebrow}
           </div>
-          <h1 className="truncate text-[15px] font-bold tracking-tight text-[color:var(--text-h)]">
-            {title ?? 'Operations Dashboard'}
-          </h1>
+          <h1 className="truncate text-[15px] font-bold tracking-tight text-[color:var(--text-h)]">{meta.title}</h1>
         </div>
       </div>
 
@@ -80,20 +89,20 @@ export function TopNavBar({ title }: { title?: string }) {
 
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] px-2.5 py-2 text-sm text-[color:var(--text-h)] shadow-[var(--shadow-sm)] transition hover:border-[color:var(--border-strong)] hover:bg-[color:var(--surface-muted)] focus-ring sm:px-3"
+          className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] px-3 py-2 text-sm text-[color:var(--text-h)] shadow-[var(--shadow-sm)] transition hover:border-[color:var(--accent-border)] hover:bg-[color:var(--surface-muted)] focus-ring sm:min-w-[11rem] sm:px-3.5"
           aria-label="Open command palette"
           onClick={openPalette}
         >
           <Search size={15} className="text-[color:var(--text-muted)]" />
-          <span className="hidden text-xs text-[color:var(--text-muted)] md:inline">Search ops…</span>
+          <span className="hidden flex-1 text-left text-xs text-[color:var(--text-muted)] md:inline">Search ops…</span>
           <kbd className="mono hidden rounded-md border border-[color:var(--border)] bg-[color:var(--surface-muted)] px-1.5 py-0.5 text-[10px] text-[color:var(--text-muted)] lg:inline">
-            ⌘K
+            {shortcut}
           </kbd>
         </button>
 
         <button
           type="button"
-          className="rounded-xl p-2 text-[color:var(--text-h)] transition hover:bg-[color:var(--surface-muted)] focus-ring"
+          className="rounded-xl p-2 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
           onClick={toggleTheme}
           aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
         >
@@ -104,7 +113,7 @@ export function TopNavBar({ title }: { title?: string }) {
 
         <Link
           to="/settings"
-          className="rounded-xl p-2 text-[color:var(--text-h)] transition hover:bg-[color:var(--surface-muted)] focus-ring"
+          className="rounded-xl p-2 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
           aria-label="Settings"
         >
           <SettingsIcon size={17} />

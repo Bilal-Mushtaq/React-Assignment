@@ -6,10 +6,14 @@ type Tone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger' | 'info'
 const tones: Record<Tone, string> = {
   neutral: 'bg-[color:var(--surface-muted)] text-[color:var(--text)] border-[color:var(--border)]',
   accent: 'bg-[color:var(--accent-bg)] text-[color:var(--accent)] border-[color:var(--accent-border)]',
-  success: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
-  warning: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
-  danger: 'bg-rose-500/10 text-rose-600 border-rose-500/30',
-  info: 'bg-sky-500/10 text-sky-600 border-sky-500/30',
+  success:
+    'bg-[color:color-mix(in_srgb,var(--success)_12%,transparent)] text-[color:var(--success)] border-[color:color-mix(in_srgb,var(--success)_30%,transparent)]',
+  warning:
+    'bg-[color:color-mix(in_srgb,var(--warning)_12%,transparent)] text-[color:var(--warning)] border-[color:color-mix(in_srgb,var(--warning)_30%,transparent)]',
+  danger:
+    'bg-[color:color-mix(in_srgb,var(--danger)_12%,transparent)] text-[color:var(--danger)] border-[color:color-mix(in_srgb,var(--danger)_30%,transparent)]',
+  info:
+    'bg-[color:color-mix(in_srgb,var(--info)_12%,transparent)] text-[color:var(--info)] border-[color:color-mix(in_srgb,var(--info)_30%,transparent)]',
 }
 
 export function Badge({

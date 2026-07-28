@@ -16,8 +16,9 @@ const variants: Record<Variant, string> = {
     'bg-[color:var(--accent)] text-[color:var(--accent-fg)] shadow-[var(--shadow-sm)] hover:brightness-110 active:brightness-95',
   secondary:
     'border border-[color:var(--border)] bg-[color:var(--surface-elevated)] text-[color:var(--text-h)] hover:bg-[color:var(--surface-muted)] hover:border-[color:var(--border-strong)]',
-  ghost: 'text-[color:var(--text)] hover:bg-black/5 hover:text-[color:var(--text-h)]',
-  danger: 'border border-rose-500/30 bg-rose-500/10 text-rose-600 hover:bg-rose-500/15',
+  ghost: 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+  danger:
+    'border border-[color:color-mix(in_srgb,var(--danger)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--danger)_10%,transparent)] text-[color:var(--danger)] hover:bg-[color:color-mix(in_srgb,var(--danger)_15%,transparent)]',
 }
 
 const sizes: Record<Size, string> = {

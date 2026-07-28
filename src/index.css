@@ -116,8 +116,8 @@ body {
 .shell-main-bg {
   background-color: var(--bg);
   background-image:
-    radial-gradient(ellipse 90% 55% at 12% -10%, var(--accent-glow), transparent 55%),
-    radial-gradient(ellipse 70% 45% at 100% 0%, color-mix(in srgb, var(--info) 10%, transparent), transparent 50%),
+    radial-gradient(ellipse 95% 60% at 8% -12%, var(--accent-glow), transparent 58%),
+    radial-gradient(ellipse 65% 50% at 100% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 52%),
     linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size:
@@ -356,8 +356,30 @@ select:disabled {
   transition: opacity 0.15s ease;
 }
 
+.react-resizable-handle-se {
+  width: 12px !important;
+  height: 12px !important;
+  right: 4px !important;
+  bottom: 4px !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.react-resizable-handle-se::after {
+  content: '';
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  border-radius: 0 0 2px 0;
+  opacity: 0.85;
+}
+
 .react-grid-item:hover .react-resizable-handle {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 /* Thin scrollbars inside widgets */
