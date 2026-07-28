@@ -8,7 +8,8 @@ export type NotificationState = {
   notifications: AppNotification[]
   addNotification: (input: { title: string; body: string; group: NotificationGroup }) => void
   markRead: (id: string) => void
-  markAllRead: () => void
+  /** When `group` is set, only that category is marked read. Otherwise marks all. */
+  markAllRead: (group?: NotificationGroup) => void
   getUnreadCount: () => number
   getGrouped: () => Record<NotificationGroup, AppNotification[]>
 }
@@ -34,8 +35,14 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     }))
   },
 
-  markAllRead: () => {
-    set((s) => ({ notifications: s.notifications.map((n) => ({ ...n, read: true })) }))
+  markAllRead: (group) => {
+    set((s) => ({
+      notifications: s.notifications.map((n) => {
+        if (n.read) return n
+        if (group && n.group !== group) return n
+        return { ...n, read: true }
+      }),
+    }))
   },
 
   getUnreadCount: () => get().notifications.filter((n) => !n.read).length,
