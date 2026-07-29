@@ -43,13 +43,13 @@ export function TopNavBar() {
 
   return (
     <header
-      className="z-30 flex h-14 shrink-0 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--surface)]/80 px-4 backdrop-blur-sm lg:px-5"
+      className="chrome-glass z-30 flex h-14 shrink-0 items-center justify-between border-b border-[color:var(--border)] px-4 lg:px-5"
       aria-label="Top navigation"
     >
       <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
         <button
           type="button"
-          className="rounded-lg p-2 text-[color:var(--text-h)] transition hover:bg-[color:var(--surface-muted)] focus-ring lg:hidden"
+          className="btn-icon rounded-lg p-2 text-[color:var(--text-h)] focus-ring lg:hidden"
           onClick={toggleMobileNav}
           aria-label="Open navigation menu"
         >
@@ -59,7 +59,7 @@ export function TopNavBar() {
         <button
           type="button"
           className={cn(
-            'hidden rounded-lg p-2 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring lg:inline-flex',
+            'btn-icon hidden rounded-lg p-2 focus-ring lg:inline-flex',
             !sidebarExpanded && 'bg-[color:var(--surface-muted)] text-[color:var(--text-h)]',
           )}
           onClick={toggleSidebarExpanded}
@@ -72,7 +72,7 @@ export function TopNavBar() {
         <div className="hidden h-5 w-px bg-[color:var(--border)] lg:block" aria-hidden="true" />
 
         <div className="min-w-0">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
             {meta.eyebrow}
           </div>
           <h1 className="truncate text-[15px] font-bold tracking-tight text-[color:var(--text-h)]">{meta.title}</h1>
@@ -80,16 +80,20 @@ export function TopNavBar() {
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2">
-        <div className="mr-1 hidden items-center gap-1.5 rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-muted)] px-2.5 py-1.5 text-[11px] text-[color:var(--text-muted)] xl:flex">
+        <div className="mr-1 hidden items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface-muted)]/80 px-3 py-1.5 text-[11px] text-[color:var(--text-muted)] xl:flex">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/60" />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          </span>
           <span className="font-medium text-[color:var(--text)]">Events</span>
-          <span className="mono font-medium tabular-nums text-[color:var(--text-h)]">
+          <span className="mono font-semibold tabular-nums text-[color:var(--text-h)]">
             {totalGenerated.toLocaleString()}
           </span>
         </div>
 
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] px-3 py-2 text-sm text-[color:var(--text-h)] shadow-[var(--shadow-sm)] transition hover:border-[color:var(--accent-border)] hover:bg-[color:var(--surface-muted)] focus-ring sm:min-w-[11rem] sm:px-3.5"
+          className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/90 px-3 py-2 text-sm text-[color:var(--text-h)] shadow-[var(--shadow-sm)] transition hover:border-[color:var(--accent-border)] hover:bg-[color:var(--surface-muted)] focus-ring sm:min-w-[11.5rem] sm:px-3.5"
           aria-label="Open command palette"
           onClick={openPalette}
         >
@@ -102,7 +106,7 @@ export function TopNavBar() {
 
         <button
           type="button"
-          className="rounded-xl p-2 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
+          className="btn-icon rounded-xl p-2 focus-ring"
           onClick={toggleTheme}
           aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
         >
@@ -113,7 +117,7 @@ export function TopNavBar() {
 
         <Link
           to="/settings"
-          className="rounded-xl p-2 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
+          className="btn-icon rounded-xl p-2 focus-ring"
           aria-label="Settings"
         >
           <SettingsIcon size={17} />

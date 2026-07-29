@@ -134,7 +134,7 @@ export function CommandPalette() {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/45 backdrop-blur-[3px]" />
         <Dialog.Content
-          className="fixed left-1/2 top-[12vh] z-[101] w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] shadow-[var(--shadow-lg)] outline-none"
+          className="fixed left-1/2 top-[12vh] z-[101] w-[min(640px,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-elevated)_94%,transparent)] shadow-[var(--shadow-lg)] outline-none backdrop-blur-xl [background-image:linear-gradient(180deg,var(--highlight),transparent_30%)]"
           onOpenAutoFocus={(e) => e.preventDefault()}
           aria-describedby={undefined}
         >

@@ -41,7 +41,7 @@ const CameraCard = memo(function CameraCard({
   return (
     <article
       className={cn(
-        'group flex h-[15.5rem] shrink-0 flex-col overflow-hidden rounded-xl border bg-[color:var(--surface-muted)]/45 transition duration-300 ease-out',
+        'group flex h-[15.5rem] shrink-0 flex-col overflow-hidden rounded-xl border bg-[color:color-mix(in_srgb,var(--surface-muted)_70%,transparent)] shadow-[var(--shadow-sm)] transition duration-300 ease-out [background-image:linear-gradient(180deg,var(--highlight),transparent_35%)]',
         isOffline
           ? 'border-[color:color-mix(in_srgb,var(--danger)_30%,transparent)] hover:border-[color:color-mix(in_srgb,var(--danger)_45%,transparent)]'
           : isDegraded

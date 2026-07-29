@@ -8,15 +8,15 @@ import { TopNavBar } from './TopNavBar'
 
 export default function ShellLayout() {
   return (
-    <div className="flex h-svh overflow-hidden bg-[color:var(--surface)] text-[color:var(--text)]">
+    <div className="shell-outer flex h-svh overflow-hidden text-[color:var(--text)]">
       <SkipLink />
       <CommandPalette />
       <Toaster />
 
       <SidebarNav />
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col p-3 lg:pl-0">
-        <div className="shell-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden shadow-[var(--shadow-lg)]">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col p-2.5 sm:p-3 lg:pl-0">
+        <div className="shell-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopNavBar />
 
           <main

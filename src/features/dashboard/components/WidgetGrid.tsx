@@ -1,15 +1,27 @@
 import { memo, useMemo, useCallback, useEffect, useRef, useState } from 'react'
-import { ResponsiveGridLayout, type ResponsiveLayouts } from 'react-grid-layout'
+import {
+  ResponsiveGridLayout,
+  verticalCompactor,
+  type Layout,
+  type LayoutItem,
+  type ResponsiveLayouts,
+} from 'react-grid-layout'
+import { gridBounds, minMaxSize } from 'react-grid-layout/core'
 import { Star, ChevronsDownUp, GripVertical, Lock } from 'lucide-react'
 import { useDashboardStore } from '../../../store/dashboardStore'
 import { widgetDefinitions, type WidgetId } from '../widgets/widgetRegistry'
 import { cn } from '../../../lib/cn'
-import { normalizeLayouts } from '../utils/normalizeLayouts'
+import { layoutsEqual, normalizeLayouts } from '../utils/normalizeLayouts'
+import { compactOnly, fitMovedAndCompact } from '../utils/adaptiveFit'
 
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
 const collapsedHeight = 2
+
+const BREAKPOINTS = { lg: 880, md: 720, sm: 0 } as const
+const COLS = { lg: 12, md: 8, sm: 6 } as const
+type Breakpoint = keyof typeof COLS
 
 function applyLayoutConstraints(
   layouts: ResponsiveLayouts,
@@ -27,7 +39,6 @@ function applyLayoutConstraints(
       return {
         ...item,
         h: collapsed ? Math.min(item.h, collapsedHeight) : item.h,
-        // Pinned widgets are locked: no drag / resize until unpinned.
         static: pinned,
       }
     })
@@ -56,15 +67,11 @@ const WidgetFrame = memo(function WidgetFrame({
   return (
     <section
       data-widget-card
+      data-pinned={pinned ? 'true' : undefined}
       aria-label={def.title}
-      className={cn(
-        'group/widget flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border bg-[color:var(--surface-elevated)] shadow-[var(--shadow-sm)] transition-shadow duration-200 hover:shadow-[var(--shadow-md)]',
-        pinned
-          ? 'border-[color:var(--accent-border)] ring-1 ring-[color:var(--accent-border)]'
-          : 'border-[color:var(--border)]',
-      )}
+      className="widget-surface group/widget flex h-full min-h-0 w-full flex-col"
     >
-      <header className="flex shrink-0 items-center justify-between gap-2 border-b border-[color:var(--border)] bg-[color:var(--surface-muted)]/60 px-3 py-2.5">
+      <header className="flex shrink-0 items-center justify-between gap-2 border-b border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-muted)_78%,transparent)] px-3 py-2.5">
         <div
           className={cn(
             'flex min-w-0 flex-1 select-none items-center gap-2',
@@ -157,10 +164,11 @@ export function WidgetGrid() {
   )
 
   const [width, setWidth] = useState(0)
-  const [breakpoint, setBreakpoint] = useState('lg')
+  const [breakpoint, setBreakpoint] = useState<Breakpoint>('lg')
   const isInteractingRef = useRef(false)
   const skipMountCommitRef = useRef(true)
-  const pendingLayoutsRef = useRef<ResponsiveLayouts | null>(null)
+  const skipNextLayoutChangeRef = useRef(false)
+  const dragSessionRef = useRef<{ id: string; preferredW: number } | null>(null)
 
   useEffect(() => {
     const el = containerRef.current
@@ -178,44 +186,91 @@ export function WidgetGrid() {
     if (!isApplyingHistory) return
     const id = window.setTimeout(() => clearApplyingHistory(), 0)
     return () => window.clearTimeout(id)
-  }, [isApplyingHistory, clearApplyingHistory, layouts])
+  }, [isApplyingHistory, clearApplyingHistory])
 
-  const handleLayoutChange = useCallback((_layout: unknown, allLayouts: ResponsiveLayouts) => {
-    if (skipMountCommitRef.current) {
-      skipMountCommitRef.current = false
-      return
-    }
-
-    if (useDashboardStore.getState().isApplyingHistory) return
-
-    if (isInteractingRef.current) {
-      pendingLayoutsRef.current = allLayouts
-    }
-  }, [])
-
-  const markInteractionStart = useCallback(() => {
-    isInteractingRef.current = true
-  }, [])
-
-  const commitInteraction = useCallback(
-    (layout?: unknown) => {
-      queueMicrotask(() => {
-        isInteractingRef.current = false
-
-        let next = pendingLayoutsRef.current
-        pendingLayoutsRef.current = null
-
-        if (!next && Array.isArray(layout)) {
-          next = {
-            ...useDashboardStore.getState().layouts,
-            [breakpoint]: layout,
-          }
-        }
-
-        if (next) setLayouts(next)
-      })
+  const persistLayout = useCallback(
+    (nextForBreakpoint: Layout) => {
+      const cols = COLS[breakpoint] ?? 12
+      const compacted = compactOnly(nextForBreakpoint, cols)
+      const next: ResponsiveLayouts = {
+        ...useDashboardStore.getState().layouts,
+        [breakpoint]: compacted,
+      }
+      const current = useDashboardStore.getState().layouts
+      if (layoutsEqual(current, next)) return
+      setLayouts(next)
     },
     [breakpoint, setLayouts],
+  )
+
+  const handleLayoutChange = useCallback(
+    (_layout: Layout, _allLayouts: ResponsiveLayouts) => {
+      // Persist only from drag/resize stop. Mid-drag + mount echoes cause update loops.
+      if (skipMountCommitRef.current) {
+        skipMountCommitRef.current = false
+        return
+      }
+      if (skipNextLayoutChangeRef.current) {
+        skipNextLayoutChangeRef.current = false
+        return
+      }
+      if (isInteractingRef.current) return
+      if (useDashboardStore.getState().isApplyingHistory) return
+    },
+    [],
+  )
+
+  const markDragStart = useCallback(
+    (_layout: Layout, _oldItem: LayoutItem | null, newItem: LayoutItem | null) => {
+      isInteractingRef.current = true
+      if (newItem) {
+        dragSessionRef.current = { id: newItem.i, preferredW: newItem.w }
+      }
+    },
+    [],
+  )
+
+  const markResizeStart = useCallback(
+    (_layout: Layout, _oldItem: LayoutItem | null, newItem: LayoutItem | null) => {
+      isInteractingRef.current = true
+      if (newItem) {
+        dragSessionRef.current = { id: newItem.i, preferredW: newItem.w }
+      }
+    },
+    [],
+  )
+
+  const commitDrag = useCallback(
+    (layout: Layout, _oldItem: LayoutItem | null, newItem: LayoutItem | null) => {
+      isInteractingRef.current = false
+      skipNextLayoutChangeRef.current = true
+
+      const cols = COLS[breakpoint] ?? 12
+      const session = dragSessionRef.current
+      const movedId = newItem?.i ?? session?.id ?? null
+      const preferredW = session?.preferredW ?? newItem?.w
+
+      dragSessionRef.current = null
+
+      const next = fitMovedAndCompact(layout, cols, movedId, preferredW)
+      const merged: ResponsiveLayouts = {
+        ...useDashboardStore.getState().layouts,
+        [breakpoint]: next,
+      }
+      if (layoutsEqual(useDashboardStore.getState().layouts, merged)) return
+      setLayouts(merged)
+    },
+    [breakpoint, setLayouts],
+  )
+
+  const commitResize = useCallback(
+    (layout: Layout) => {
+      isInteractingRef.current = false
+      skipNextLayoutChangeRef.current = true
+      dragSessionRef.current = null
+      persistLayout(layout)
+    },
+    [persistLayout],
   )
 
   const widgetIds = useMemo(() => Object.keys(widgetDefinitions) as WidgetId[], [])
@@ -231,23 +286,34 @@ export function WidgetGrid() {
   }
 
   return (
-    <div ref={containerRef} className="w-full max-w-full overflow-hidden" aria-label="Dashboard widget grid">
+    <div
+      ref={containerRef}
+      className="w-full max-w-full overflow-hidden"
+      aria-label="Dashboard widget grid"
+    >
       <ResponsiveGridLayout
-        className="layout"
+        className="layout vigil-grid"
         width={width}
         layouts={effectiveLayouts}
-        dragConfig={{ handle: '.widget-drag-handle' }}
+        compactor={verticalCompactor}
+        constraints={[gridBounds, minMaxSize]}
+        dragConfig={{
+          handle: '.widget-drag-handle',
+          threshold: 5,
+        }}
+        resizeConfig={{
+          enabled: true,
+          // Corner + edges only — avoids the default dotted SVG handles on every side
+          handles: ['se', 'e', 's'],
+        }}
         onLayoutChange={handleLayoutChange}
-        onBreakpointChange={(bp) => setBreakpoint(bp)}
-        onDragStart={markInteractionStart}
-        onResizeStart={markInteractionStart}
-        onDragStop={(layout) => commitInteraction(layout)}
-        onResizeStop={(layout) => commitInteraction(layout)}
-        // Breakpoints use the *grid container* width (main panel), not the viewport.
-        // Expanded sidebar (~248px) + padding means viewport 1280 ≈ container ~1020,
-        // so lg must be lower than 1200 or the desktop layout only appears ~1514px+.
-        breakpoints={{ lg: 880, md: 720, sm: 0 }}
-        cols={{ lg: 12, md: 8, sm: 6 }}
+        onBreakpointChange={(bp) => setBreakpoint(bp as Breakpoint)}
+        onDragStart={markDragStart}
+        onResizeStart={markResizeStart}
+        onDragStop={commitDrag}
+        onResizeStop={commitResize}
+        breakpoints={BREAKPOINTS}
+        cols={COLS}
         rowHeight={40}
         margin={[12, 12]}
         containerPadding={[0, 0]}

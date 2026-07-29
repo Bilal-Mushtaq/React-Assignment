@@ -66,7 +66,7 @@ export default function DashboardRoute() {
 
   return (
     <div className="space-y-4" aria-label="Dashboard">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-elevated)_88%,transparent)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-md [background-image:linear-gradient(180deg,var(--highlight),transparent_40%)]">
         <div className="min-w-0">
           <h2 className="text-lg font-bold tracking-tight text-[color:var(--text-h)]">Operations board</h2>
           <p className="mt-0.5 text-xs text-[color:var(--text-muted)]">
@@ -75,7 +75,7 @@ export default function DashboardRoute() {
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          <div className="flex items-center rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-0.5">
+          <div className="flex items-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface)]/70 p-0.5 shadow-[var(--shadow-sm)]">
             <Button
               size="sm"
               variant="ghost"

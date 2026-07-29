@@ -51,17 +51,21 @@ export function KpiWidget() {
         return (
           <div
             key={item.key}
-            className="relative overflow-hidden rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]/70 p-3 transition hover:border-[color:var(--border-strong)]"
+            className="relative overflow-hidden rounded-xl border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-muted)_78%,transparent)] p-3 shadow-[var(--shadow-sm)] transition hover:border-[color:var(--border-strong)] hover:shadow-[var(--shadow-md)] [background-image:linear-gradient(165deg,var(--highlight),transparent_45%)]"
           >
             <div
+              aria-hidden="true"
+              className={cn('absolute -right-3 -top-3 h-12 w-12 rounded-full opacity-40 blur-2xl', item.tone)}
+            />
+            <div
               className={cn(
-                'text-xl font-bold tabular-nums tracking-tight',
+                'relative z-[1] text-xl font-bold tabular-nums tracking-tight',
                 isZero ? 'text-[color:var(--text-muted)]' : 'text-[color:var(--text-h)]',
               )}
             >
               <AnimatedCounter value={value} suffix={item.suffix} />
             </div>
-            <div className="mt-2 flex items-center gap-2">
+            <div className="relative z-[1] mt-2 flex items-center gap-2">
               <div className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-md', item.tone)}>
                 <Icon size={12} aria-hidden="true" />
               </div>

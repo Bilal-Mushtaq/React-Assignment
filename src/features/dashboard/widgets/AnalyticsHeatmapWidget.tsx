@@ -35,7 +35,7 @@ export function AnalyticsHeatmapWidget() {
   const [hoveredCell, setHoveredCell] = useState<HoveredCell | null>(null)
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2.5" aria-label="Analytics and heatmap widget">
+    <div className="flex h-full min-h-0 flex-col gap-3" aria-label="Analytics and heatmap widget">
       {empty ? (
         <div className="flex h-full min-h-[120px] flex-col items-center justify-center rounded-xl border border-dashed border-[color:var(--border)] bg-[color:var(--surface-muted)]/40 px-4 text-center">
           <div className="text-sm font-medium text-[color:var(--text-h)]">No analytics yet</div>
@@ -43,8 +43,8 @@ export function AnalyticsHeatmapWidget() {
         </div>
       ) : (
         <>
-          <div className="relative shrink-0 overflow-visible rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]/50 p-2.5">
-            <div className="mb-2 flex items-center justify-between">
+          <div className="relative flex min-h-[9rem] flex-[0.42] flex-col overflow-visible rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]/50 p-2.5">
+            <div className="mb-2 flex shrink-0 items-center justify-between">
               <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
                 Event rate
               </span>
@@ -77,7 +77,7 @@ export function AnalyticsHeatmapWidget() {
                 )}
               </AnimatePresence>
             </div>
-            <div className="flex h-14 items-end gap-0.5" onMouseLeave={() => setHoveredBar(null)}>
+            <div className="flex min-h-0 flex-1 items-end gap-0.5" onMouseLeave={() => setHoveredBar(null)}>
               {series.map((value, idx) => {
                 const height = seriesMax === 0 ? 0 : (value / seriesMax) * 100
                 const active = hoveredBar?.idx === idx
@@ -97,7 +97,7 @@ export function AnalyticsHeatmapWidget() {
                       opacity: { duration: 0.18 },
                       height: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
                     }}
-                    whileHover={{ scaleY: 1.08, scaleX: 1.35 }}
+                    whileHover={{ scaleY: 1.06, scaleX: 1.25 }}
                     onMouseEnter={() => setHoveredBar({ idx, value })}
                     onFocus={() => setHoveredBar({ idx, value })}
                     onBlur={() => setHoveredBar(null)}
@@ -130,7 +130,8 @@ export function AnalyticsHeatmapWidget() {
             </div>
           </div>
 
-          <div className="widget-scroll relative min-h-0 flex-1 overflow-auto rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]/50 p-2.5">
+          {/* Density heatmap: remaining height + slightly taller cells */}
+          <div className="widget-scroll relative min-h-0 flex-[0.58] overflow-auto rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)]/50 p-2.5">
             <div className="mb-2 flex items-center justify-between gap-2">
               <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
                 Density heatmap
@@ -184,7 +185,7 @@ export function AnalyticsHeatmapWidget() {
             </div>
 
             <div
-              className="grid grid-cols-[28px_repeat(24,minmax(0,1fr))] gap-px text-[8px] text-[color:var(--text-muted)]"
+              className="grid h-[calc(100%-1.5rem)] min-h-[11rem] grid-cols-[28px_repeat(24,minmax(0,1fr))] grid-rows-[auto_repeat(7,minmax(0,1fr))] gap-0.5 text-[8px] text-[color:var(--text-muted)]"
               onMouseLeave={() => setHoveredCell(null)}
             >
               <div />
@@ -225,10 +226,10 @@ export function AnalyticsHeatmapWidget() {
                         onBlur={() => setHoveredCell(null)}
                         aria-label={`${DAY_FULL[day]} ${formatHour(hour)}: ${value} events, ${intensityLabel(intensity)} density`}
                         className={cn(
-                          'relative aspect-square rounded-[2px] outline-none transition-all duration-200 ease-out',
+                          'relative min-h-0 w-full rounded-[2px] outline-none transition-all duration-200 ease-out',
                           'focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[color:var(--surface-muted)]',
                           active &&
-                            'z-10 scale-[1.55] rounded-[3px] shadow-[0_0_10px_var(--accent-glow)] ring-1 ring-[color:var(--accent-border)]',
+                            'z-10 scale-[1.35] rounded-[3px] shadow-[0_0_10px_var(--accent-glow)] ring-1 ring-[color:var(--accent-border)]',
                           dimmed && 'opacity-40',
                         )}
                         style={{

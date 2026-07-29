@@ -32,7 +32,7 @@ const MODE_OPTIONS: Array<{
   },
 ]
 
-const ACCENT_PRESETS = ['#0f766e', '#0d9488', '#0284c7', '#0369a1', '#059669', '#d97706'] as const
+const ACCENT_PRESETS = ['#AEAFB5', '#FFFFFF', '#161B2A', '#8B8D96', '#C8C9CE', '#4A5568'] as const
 
 function SectionTitle({ title, description }: { title: string; description: string }) {
   return (
@@ -68,7 +68,7 @@ export default function SettingsRoute() {
 
   return (
     <div className="w-full space-y-4 pb-8" aria-label="Settings">
-      <header className="flex flex-wrap items-end justify-between items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)] backdrop-blur-sm">
+      <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-elevated)_88%,transparent)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-md [background-image:linear-gradient(180deg,var(--highlight),transparent_40%)]">
         <div className="min-w-0">
           <h2 className="text-lg font-bold tracking-tight text-[color:var(--text-h)]">Appearance</h2>
           <p className="mt-0.5 text-xs text-[color:var(--text-muted)]">
@@ -89,7 +89,7 @@ export default function SettingsRoute() {
         </Button>
       </header>
 
-      <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
+      <section className="widget-surface rounded-2xl p-4">
         <SectionTitle title="Theme mode" description="Choose how Vigil renders across screens" />
 
         <div className="grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Theme mode">
@@ -129,7 +129,7 @@ export default function SettingsRoute() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
+        <section className="widget-surface rounded-2xl p-4">
           <SectionTitle title="Accent color" description="Brand highlight used across controls" />
 
           <div className="flex flex-wrap items-center gap-2">
@@ -187,7 +187,7 @@ export default function SettingsRoute() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
+        <section className="widget-surface rounded-2xl p-4">
           <SectionTitle title="Sidebar" description="Default desktop navigation width" />
 
           <button
@@ -229,7 +229,7 @@ export default function SettingsRoute() {
         </section>
       </div>
 
-      <section className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)] p-4 shadow-[var(--shadow-sm)]">
+      <section className="widget-surface rounded-2xl p-4">
         <SectionTitle title="Density & radius" description="Live adjustments — no apply step needed" />
 
         <div className="grid gap-4 lg:grid-cols-2">

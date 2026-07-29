@@ -172,7 +172,7 @@ export function NotificationPanel() {
       <button
         ref={triggerRef}
         type="button"
-        className="relative rounded-xl p-2 text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
+        className="btn-icon relative rounded-xl p-2 focus-ring"
         aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
         aria-expanded={open}
         aria-controls="notification-center"
@@ -209,7 +209,8 @@ export function NotificationPanel() {
                     exit={{ opacity: 0, y: 16, scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 420, damping: 32 }}
                     className={cn(
-                      'fixed z-[190] flex flex-col overflow-hidden border border-[color:var(--border)] bg-[color:var(--surface-elevated)] shadow-[var(--shadow-lg)]',
+                      'fixed z-[190] flex flex-col overflow-hidden border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-elevated)_92%,transparent)] shadow-[var(--shadow-lg)] backdrop-blur-xl',
+                      '[background-image:linear-gradient(180deg,var(--highlight),transparent_24%)]',
                       'inset-x-0 bottom-0 max-h-[min(88svh,40rem)] rounded-t-2xl',
                       'sm:inset-auto sm:right-12 sm:top-16 sm:bottom-auto sm:left-auto sm:max-h-[min(32rem,calc(100svh-5.5rem))] sm:w-[24rem] sm:rounded-2xl sm:origin-top-right',
                       'md:right-16',

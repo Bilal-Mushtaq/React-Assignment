@@ -28,30 +28,30 @@ export const defaultPinnedWidgetIds: WidgetId[] = []
 
 export function getDefaultLayouts(): ResponsiveLayouts {
   const lg: Layout = [
-    { i: 'kpis', x: 0, y: 0, w: 3, h: 5, minW: 2, minH: 5 },
-    { i: 'cameras', x: 3, y: 0, w: 6, h: 16, minW: 3, minH: 10 },
-    { i: 'activity', x: 9, y: 0, w: 3, h: 11, minW: 2, minH: 5 },
-    { i: 'incidents', x: 0, y: 6, w: 3, h: 9, minW: 2, minH: 5 },
-    { i: 'analytics', x: 0, y: 16, w: 8, h: 9, minW: 3, minH: 5 },
-    { i: 'alerts', x: 8, y: 16, w: 4, h: 9, minW: 2, minH: 5 },
+    { i: 'kpis', x: 0, y: 0, w: 3, h: 5, minW: 2, minH: 4 },
+    { i: 'cameras', x: 3, y: 0, w: 6, h: 17, minW: 2, minH: 10 },
+    { i: 'activity', x: 9, y: 0, w: 3, h: 16, minW: 2, minH: 6 },
+    { i: 'incidents', x: 0, y: 5, w: 3, h: 11, minW: 2, minH: 5 },
+    { i: 'analytics', x: 0, y: 16, w: 8, h: 13, minW: 3, minH: 9 },
+    { i: 'alerts', x: 8, y: 16, w: 4, h: 13, minW: 2, minH: 6 },
   ]
 
   const md: Layout = [
-    { i: 'kpis', x: 0, y: 0, w: 8, h: 6, minW: 4, minH: 4 },
-    { i: 'cameras', x: 0, y: 5, w: 8, h: 14, minW: 4, minH: 10 },
-    { i: 'alerts', x: 0, y: 19, w: 4, h: 6, minW: 3, minH: 4 },
-    { i: 'incidents', x: 4, y: 19, w: 4, h: 6, minW: 3, minH: 4 },
-    { i: 'analytics', x: 0, y: 25, w: 5, h: 6, minW: 3, minH: 4 },
-    { i: 'activity', x: 5, y: 25, w: 3, h: 6, minW: 2, minH: 4 },
+    { i: 'kpis', x: 0, y: 0, w: 8, h: 5, minW: 4, minH: 4 },
+    { i: 'cameras', x: 0, y: 5, w: 8, h: 14, minW: 3, minH: 10 },
+    { i: 'alerts', x: 0, y: 19, w: 4, h: 8, minW: 2, minH: 5 },
+    { i: 'incidents', x: 4, y: 19, w: 4, h: 8, minW: 2, minH: 5 },
+    { i: 'analytics', x: 0, y: 27, w: 5, h: 11, minW: 3, minH: 8 },
+    { i: 'activity', x: 5, y: 27, w: 3, h: 11, minW: 2, minH: 5 },
   ]
 
   const sm: Layout = [
-    { i: 'kpis', x: 0, y: 0, w: 6, h: 6, minW: 4, minH: 4 },
-    { i: 'cameras', x: 0, y: 5, w: 6, h: 14, minW: 4, minH: 10 },
-    { i: 'alerts', x: 0, y: 19, w: 6, h: 6, minW: 4, minH: 4 },
-    { i: 'incidents', x: 0, y: 25, w: 6, h: 6, minW: 4, minH: 4 },
-    { i: 'analytics', x: 0, y: 31, w: 6, h: 6, minW: 4, minH: 4 },
-    { i: 'activity', x: 0, y: 37, w: 6, h: 6, minW: 4, minH: 4 },
+    { i: 'kpis', x: 0, y: 0, w: 6, h: 5, minW: 3, minH: 4 },
+    { i: 'cameras', x: 0, y: 5, w: 6, h: 14, minW: 3, minH: 10 },
+    { i: 'alerts', x: 0, y: 19, w: 6, h: 8, minW: 3, minH: 5 },
+    { i: 'incidents', x: 0, y: 27, w: 6, h: 8, minW: 3, minH: 5 },
+    { i: 'analytics', x: 0, y: 35, w: 6, h: 12, minW: 3, minH: 9 },
+    { i: 'activity', x: 0, y: 47, w: 6, h: 8, minW: 3, minH: 5 },
   ]
 
   return { lg, md, sm }

@@ -197,7 +197,7 @@ export const useDashboardStore = create<DashboardState>()(
     }),
     {
       name: 'vigil.dashboard',
-      version: 9,
+      version: 12,
       migrate: (persisted) => {
         const state = persisted as Partial<Snapshot>
         return {

@@ -85,10 +85,10 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
         <div className={cn('flex min-w-0 items-center', expanded ? 'gap-3' : 'justify-center')}>
           <div
             aria-hidden="true"
-            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color:var(--accent)] text-[color:var(--accent-fg)] shadow-[var(--shadow-sm)]"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[color:var(--accent-border)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--accent)_88%,white),var(--accent))] text-[color:var(--accent-fg)] shadow-[var(--shadow-md)]"
           >
-            <Sparkles size={18} />
-            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[color:var(--surface)] bg-emerald-400" />
+            <Sparkles size={17} strokeWidth={2.25} />
+            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[color:var(--surface)] bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.55)]" />
           </div>
 
           <AnimatePresence initial={false}>
@@ -101,8 +101,8 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
                 transition={fadeSoft}
                 className="min-w-0 overflow-hidden"
               >
-                <div className="truncate text-md font-bold tracking-tight text-[color:var(--text-h)]">Vigil</div>
-                <div className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
+                <div className="truncate text-lg font-bold tracking-tight text-[color:var(--text-h)]">Vigil</div>
+                <div className="truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                   AI Ops Center
                 </div>
               </motion.div>
@@ -333,9 +333,9 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={fadeSoft}
-            className="mt-auto shrink-0 border-t border-[color:var(--border)] bg-[color:var(--surface)] p-3"
+            className="mt-auto shrink-0 border-t border-[color:var(--border)] p-3"
           >
-            <div className="rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-3">
+            <div className="rounded-xl border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-muted)_85%,transparent)] p-3 shadow-[var(--shadow-sm)] [background-image:linear-gradient(180deg,var(--highlight),transparent_50%)]">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold text-[color:var(--text-h)]">System</span>
                 <Badge tone="success">
