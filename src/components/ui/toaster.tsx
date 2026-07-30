@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react'
 import { useToastStore, type Toast, type ToastTone } from '../../store/toastStore'
 import { cn } from '../../lib/cn'
+import { toastTransition } from '../../lib/motion'
 
 const TONE_META: Record<
   ToastTone,
@@ -51,10 +52,10 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
     <motion.div
       layout
       role="status"
-      initial={{ opacity: 0, y: 16, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, x: -24, scale: 0.96 }}
-      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, y: 18, scale: 0.96, filter: 'blur(4px)' }}
+      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, x: -20, scale: 0.96, filter: 'blur(3px)' }}
+      transition={toastTransition}
       className={cn(
         'pointer-events-auto flex w-[min(22rem,calc(100vw-2rem))] items-start gap-2.5 rounded-xl border p-3 shadow-[var(--shadow-lg)] backdrop-blur-sm',
         meta.border,

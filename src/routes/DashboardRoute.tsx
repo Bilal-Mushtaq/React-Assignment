@@ -1,14 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { Download, RotateCcw, Redo2, Undo2, Upload } from 'lucide-react'
 import { WidgetGrid } from '../features/dashboard/components/WidgetGrid'
 import { Button } from '../components/ui/button'
 import { DashboardSkeleton } from '../components/common/PageSkeletons'
 import { usePageReady } from '../hooks/usePageReady'
 import { useDashboardStore } from '../store/dashboardStore'
+import { useBootStore } from '../store/bootStore'
 import { useCommandPaletteStore } from '../store/commandPaletteStore'
+import { staggerContainer, staggerItem } from '../lib/motion'
 
 export default function DashboardRoute() {
-  const ready = usePageReady()
+  const bootComplete = useBootStore((s) => s.complete)
+  const playedBoot = useBootStore((s) => s.playedThisSession)
+  // Skeleton starts AFTER boot ends, long enough to read; revisits are instant
+  const ready = usePageReady('dashboard', playedBoot ? 680 : 520, bootComplete)
   const [importError, setImportError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -65,8 +71,17 @@ export default function DashboardRoute() {
   if (!ready) return <DashboardSkeleton />
 
   return (
-    <div className="space-y-4" aria-label="Dashboard">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-elevated)_88%,transparent)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-md [background-image:linear-gradient(180deg,var(--highlight),transparent_40%)]">
+    <motion.div
+      className="space-y-4"
+      aria-label="Dashboard"
+      initial="initial"
+      animate="animate"
+      variants={staggerContainer}
+    >
+      <motion.div
+        variants={staggerItem}
+        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-elevated)_88%,transparent)] p-4 shadow-[var(--shadow-sm)] backdrop-blur-md [background-image:linear-gradient(180deg,var(--highlight),transparent_40%)]"
+      >
         <div className="min-w-0">
           <h2 className="text-lg font-bold tracking-tight text-[color:var(--text-h)]">Operations board</h2>
           <p className="mt-0.5 text-xs text-[color:var(--text-muted)]">
@@ -130,15 +145,20 @@ export default function DashboardRoute() {
             tabIndex={-1}
           />
         </div>
-      </div>
+      </motion.div>
 
       {importError ? (
-        <div className="rounded-xl border border-[color:color-mix(in_srgb,var(--danger)_40%,transparent)] bg-[color:color-mix(in_srgb,var(--danger)_10%,transparent)] px-4 py-3 text-sm text-[color:var(--danger)]">
+        <motion.div
+          variants={staggerItem}
+          className="rounded-xl border border-[color:color-mix(in_srgb,var(--danger)_40%,transparent)] bg-[color:color-mix(in_srgb,var(--danger)_10%,transparent)] px-4 py-3 text-sm text-[color:var(--danger)]"
+        >
           {importError}
-        </div>
+        </motion.div>
       ) : null}
 
-      <WidgetGrid />
-    </div>
+      <motion.div variants={staggerItem}>
+        <WidgetGrid />
+      </motion.div>
+    </motion.div>
   )
 }

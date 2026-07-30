@@ -10,9 +10,10 @@ function createEmptyHeatmap(): number[][] {
 
 export type AnalyticsState = {
   heatmap: number[][]
-  eventRateSeries: number[]
+  /** Estimated visitors per hour for the last 24 hours */
+  visitorSeries: number[]
   tickHeatmap: (day: number, hour: number, value: number) => void
-  pushEventRate: (value: number) => void
+  pushVisitorCount: (value: number) => void
   getKpis: () => KpiSnapshot
   setKpiOverrides: (kpis: Partial<KpiSnapshot>) => void
   kpiOverrides: Partial<KpiSnapshot>
@@ -20,7 +21,7 @@ export type AnalyticsState = {
 
 export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
   heatmap: createEmptyHeatmap(),
-  eventRateSeries: Array.from({ length: 24 }, () => randomBase()),
+  visitorSeries: Array.from({ length: 24 }, () => randomBase()),
   kpiOverrides: {},
 
   tickHeatmap: (day, hour, value) => {
@@ -28,14 +29,16 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
       const heatmap = s.heatmap.map((row) => [...row])
       const d = Math.max(0, Math.min(DAYS - 1, day))
       const h = Math.max(0, Math.min(HOURS - 1, hour))
-      heatmap[d]![h] = Math.min(100, (heatmap[d]![h] ?? 0) + value)
+      // Soft cap — keeps the map from becoming a solid wall over time
+      heatmap[d]![h] = Math.min(24, (heatmap[d]![h] ?? 0) + Math.min(value, 3))
       return { heatmap }
     })
   },
 
-  pushEventRate: (value) => {
+  pushVisitorCount: (value) => {
     set((s) => ({
-      eventRateSeries: [...s.eventRateSeries.slice(1), value],
+      // Floor small ticks so the sparkline never collapses to hairline bars
+      visitorSeries: [...s.visitorSeries.slice(1), Math.max(8, value)],
     }))
   },
 
@@ -53,5 +56,5 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
 }))
 
 function randomBase() {
-  return Math.floor(Math.random() * 40) + 10
+  return Math.floor(Math.random() * 80) + 20
 }

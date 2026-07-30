@@ -330,62 +330,247 @@ select:disabled {
   }
 }
 
-/* Scanline feel for camera previews */
-.camera-preview {
+/* ── Camera feed (HD still + connecting UX) ─────────────────────────────── */
+.camera-feed {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #0b1018;
+  contain: layout paint;
+}
+
+.camera-feed__base {
+  position: absolute;
+  inset: 0;
   background:
-    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.03) 2px,
-      rgba(255, 255, 255, 0.03) 4px
-    ),
-    radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 55%),
+    radial-gradient(ellipse at 28% 18%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 55%),
     linear-gradient(145deg, #1a2332 0%, #0f1623 45%, #15202e 100%);
 }
 
-.camera-preview--offline {
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.55) 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.02) 2px,
-      rgba(255, 255, 255, 0.02) 4px
-    ),
-    linear-gradient(145deg, #2a1a1f 0%, #141018 50%, #1a1216 100%);
-  filter: grayscale(0.85) contrast(0.9);
+.camera-feed__img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transform: scale(1.06);
+  filter: saturate(0.92) contrast(1.05);
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.45s ease;
+  will-change: opacity, transform;
 }
 
-.camera-preview--degraded {
+.camera-feed__img.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.camera-feed__img--live.is-visible {
+  animation: camera-kenburns 28s ease-in-out infinite alternate;
+}
+
+.camera-feed--offline .camera-feed__img.is-visible {
+  filter: grayscale(0.92) contrast(0.88) brightness(0.72);
+  animation: none;
+  transform: scale(1.02);
+}
+
+.camera-feed--degraded:not(.camera-feed--offline) .camera-feed__img.is-visible {
+  filter: saturate(0.7) contrast(1.08) sepia(0.18) brightness(0.92);
+}
+
+.camera-feed__glass {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   background:
-    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, transparent 28%, transparent 62%, rgba(0, 0, 0, 0.55) 100%),
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      rgba(255, 255, 255, 0.035) 2px,
-      rgba(255, 255, 255, 0.035) 4px
+      rgba(255, 255, 255, 0.018) 2px,
+      rgba(255, 255, 255, 0.018) 4px
+    );
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.35);
+}
+
+.camera-feed__chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: inherit;
+  pointer-events: none;
+}
+
+.camera-feed__chrome > * {
+  pointer-events: auto;
+}
+
+.camera-feed__connecting {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.camera-feed__shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.06) 45%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: camera-shimmer 1.35s ease-in-out infinite;
+}
+
+.camera-feed__connect-ui {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.camera-feed__pulse-ring {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.25);
+  animation: camera-pulse-ring 1.6s ease-out infinite;
+}
+
+.camera-feed__connect-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.camera-feed__connect-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 12px;
+}
+
+.camera-feed__connect-bars i {
+  display: block;
+  width: 3px;
+  height: 4px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.55);
+  animation: camera-eq 0.9s ease-in-out infinite;
+}
+
+.camera-feed__connect-bars i:nth-child(2) {
+  animation-delay: 0.12s;
+  height: 7px;
+}
+.camera-feed__connect-bars i:nth-child(3) {
+  animation-delay: 0.24s;
+  height: 10px;
+}
+.camera-feed__connect-bars i:nth-child(4) {
+  animation-delay: 0.36s;
+  height: 6px;
+}
+
+.camera-feed__corner {
+  position: absolute;
+  z-index: 5;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(255, 255, 255, 0.4);
+  border-style: solid;
+  border-width: 0;
+  pointer-events: none;
+}
+.camera-feed__corner--tl {
+  top: 8px;
+  left: 8px;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+.camera-feed__corner--tr {
+  top: 8px;
+  right: 8px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+.camera-feed__corner--bl {
+  bottom: 8px;
+  left: 8px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+.camera-feed__corner--br {
+  bottom: 8px;
+  right: 8px;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+.camera-feed__nosignal {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(0, 0, 0, 0.15) 1px,
+      rgba(0, 0, 0, 0.15) 2px
     ),
-    radial-gradient(ellipse at 40% 25%, rgba(245, 158, 11, 0.28), transparent 55%),
-    linear-gradient(145deg, #2a2418 0%, #17140f 50%, #1f1a12 100%);
+    rgba(0, 0, 0, 0.55);
+  animation: camera-noise 0.35s steps(2) infinite;
+}
+
+.camera-feed__degrade-bar {
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.85), transparent);
+  animation: camera-degrade-sweep 2.4s ease-in-out infinite;
 }
 
 .camera-scanline {
   pointer-events: none;
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.045) 48%,
+    rgba(255, 255, 255, 0.04) 48%,
     transparent 52%
   );
   background-size: 100% 220%;
-  animation: camera-scan 4.5s linear infinite;
-  opacity: 0.7;
+  animation: camera-scan 5.5s linear infinite;
+  opacity: 0.55;
 }
 
 @keyframes camera-scan {
@@ -397,18 +582,86 @@ select:disabled {
   }
 }
 
-:root[data-theme='light'] .camera-preview {
-  background:
-    linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.28) 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.04) 2px,
-      rgba(255, 255, 255, 0.04) 4px
-    ),
-    radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 55%),
-    linear-gradient(145deg, #334155 0%, #1e293b 50%, #0f172a 100%);
+@keyframes camera-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -40% 0;
+  }
+}
+
+@keyframes camera-pulse-ring {
+  0% {
+    transform: scale(0.85);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.35);
+    box-shadow: 0 0 0 12px rgba(255, 255, 255, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes camera-eq {
+  0%,
+  100% {
+    transform: scaleY(0.45);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes camera-kenburns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.08) translate(-1.5%, -1%);
+  }
+}
+
+@keyframes camera-noise {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 3px;
+  }
+}
+
+@keyframes camera-degrade-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera-feed__img--live.is-visible,
+  .camera-scanline,
+  .camera-feed__shimmer,
+  .camera-feed__pulse-ring,
+  .camera-feed__connect-bars i,
+  .camera-feed__nosignal,
+  .camera-feed__degrade-bar {
+    animation: none !important;
+  }
+
+  .camera-feed__img {
+    transition: opacity 0.25s ease;
+    transform: none;
+  }
+
+  .camera-feed__img.is-visible {
+    transform: none;
+  }
 }
 
 /* react-grid-layout — clean motion, no vendor handle dots */
@@ -557,6 +810,76 @@ select:disabled {
   opacity: 1;
 }
 
+/* Brand boot atmosphere */
+@keyframes vigil-boot-ring {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.04);
+  }
+}
+
+.boot-ring {
+  animation: vigil-boot-ring 2.4s ease-in-out infinite;
+}
+
+.boot-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+@keyframes vigil-widget-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.vigil-grid--reveal > .react-grid-item {
+  animation: vigil-widget-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vigil-grid--reveal > .react-grid-item:nth-child(1) {
+  animation-delay: 0.04s;
+}
+.vigil-grid--reveal > .react-grid-item:nth-child(2) {
+  animation-delay: 0.09s;
+}
+.vigil-grid--reveal > .react-grid-item:nth-child(3) {
+  animation-delay: 0.14s;
+}
+.vigil-grid--reveal > .react-grid-item:nth-child(4) {
+  animation-delay: 0.19s;
+}
+.vigil-grid--reveal > .react-grid-item:nth-child(5) {
+  animation-delay: 0.24s;
+}
+.vigil-grid--reveal > .react-grid-item:nth-child(6) {
+  animation-delay: 0.29s;
+}
+.vigil-grid--reveal > .react-grid-item:nth-child(7) {
+  animation-delay: 0.34s;
+}
+.vigil-grid--reveal > .react-grid-item:nth-child(8) {
+  animation-delay: 0.39s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-ring {
+    animation: none;
+  }
+
+  .vigil-grid--reveal > .react-grid-item {
+    animation: none;
+  }
+}
+
 /* Thin scrollbars inside widgets */
 .widget-scroll::-webkit-scrollbar {
   width: 6px;
@@ -570,6 +893,11 @@ select:disabled {
 
 .widget-scroll::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.main-scroll {
+  /* Prevent scrollbar appearing/disappearing from changing content width (XL flash loop) */
+  scrollbar-gutter: stable;
 }
 
 .main-scroll::-webkit-scrollbar {

@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import { useTimelineStore } from '../../../store/timelineStore'
 import { formatRelativeTime, severityTone } from '../../../utils/format'
 import { Badge } from '../../../components/ui/badge'
@@ -20,10 +22,19 @@ export function IncidentsWidget() {
     <div className="flex h-full min-h-0 flex-col" aria-label="Incident timeline widget">
       <div className="mb-1.5 flex shrink-0 items-center justify-between text-[11px] text-[color:var(--text-muted)]">
         <span className="font-medium text-[color:var(--text)]">Recent timeline</span>
-        <span className="mono tabular-nums text-[color:var(--text-h)]">{incidents.length}</span>
+        <div className="flex items-center gap-2">
+          <span className="mono tabular-nums text-[color:var(--text-h)]">{incidents.length}</span>
+          <Link
+            to="/incidents"
+            className="inline-flex items-center gap-0.5 rounded-lg px-1.5 py-1 text-[10px] font-semibold text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
+          >
+            All
+            <ArrowRight size={11} />
+          </Link>
+        </div>
       </div>
 
-      <div className="widget-scroll min-h-0 flex-1 space-y-2 overflow-auto">
+      <div className="widget-scroll min-h-0 flex-1 space-y-2 pr-2 overflow-auto">
         {incidents.length === 0 ? (
           <div className="flex h-full min-h-[120px] flex-col items-center justify-center rounded-xl border border-dashed border-[color:var(--border)] bg-[color:var(--surface-muted)]/40 px-4 text-center">
             <div className="text-sm font-medium text-[color:var(--text-h)]">No incidents</div>

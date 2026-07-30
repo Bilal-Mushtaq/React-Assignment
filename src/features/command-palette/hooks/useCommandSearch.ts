@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { SITE } from '../../../constants/mockData'
 import { widgetDefinitions } from '../../dashboard/widgets/widgetRegistry'
 import { useAlertsStore } from '../../../store/alertsStore'
 import { useCameraStore } from '../../../store/cameraStore'
@@ -58,6 +59,46 @@ export function useCommandSearch(query: string) {
         onSelect: () => navigate('/dashboard'),
       },
       {
+        id: 'nav-cameras',
+        category: 'navigation',
+        title: 'Go to Cameras',
+        subtitle: `/cameras · ${SITE.name}`,
+        keywords: ['feeds', 'mall', 'alnakheel', 'cameras'],
+        onSelect: () => navigate('/cameras'),
+      },
+      {
+        id: 'nav-activity',
+        category: 'navigation',
+        title: 'Go to Activity',
+        subtitle: '/activity · live ops stream',
+        keywords: ['feed', 'events', 'timeline', 'activity', 'log'],
+        onSelect: () => navigate('/activity'),
+      },
+      {
+        id: 'nav-alerts',
+        category: 'navigation',
+        title: 'Go to Alerts',
+        subtitle: '/alerts · acknowledge & resolve',
+        keywords: ['alert', 'critical', 'severity', 'ack'],
+        onSelect: () => navigate('/alerts'),
+      },
+      {
+        id: 'nav-incidents',
+        category: 'navigation',
+        title: 'Go to Incidents',
+        subtitle: '/incidents · case timeline',
+        keywords: ['incident', 'case', 'timeline'],
+        onSelect: () => navigate('/incidents'),
+      },
+      {
+        id: 'nav-traffic',
+        category: 'navigation',
+        title: 'Go to Mall Traffic',
+        subtitle: '/traffic · visitors & busy hours',
+        keywords: ['analytics', 'heatmap', 'visitors', 'traffic', 'charts'],
+        onSelect: () => navigate('/traffic'),
+      },
+      {
         id: 'nav-settings',
         category: 'navigation',
         title: 'Go to Settings',
@@ -90,11 +131,8 @@ export function useCommandSearch(query: string) {
         category: 'camera',
         title: camera.name,
         subtitle: `${camera.zone} · ${camera.status} · AI ${camera.aiConfidence}%`,
-        keywords: [camera.id, camera.zone, camera.status, 'camera', 'feed'],
-        onSelect: () => {
-          navigate('/dashboard')
-          scrollToWidget('cameras')
-        },
+        keywords: [camera.id, camera.zone, camera.status, 'camera', 'feed', 'mall'],
+        onSelect: () => navigate(`/cameras/${camera.id}`),
       }
       if (matchesQuery(item, query)) items.push(item)
     }
@@ -107,8 +145,11 @@ export function useCommandSearch(query: string) {
         subtitle: `${alert.severity} · ${alert.status}`,
         keywords: [alert.severity, alert.status, alert.message, 'alert', 'incident'],
         onSelect: () => {
-          navigate('/dashboard')
-          scrollToWidget('alerts')
+          if (alert.cameraId) navigate(`/cameras/${alert.cameraId}`)
+          else {
+            navigate('/dashboard')
+            scrollToWidget('alerts')
+          }
         },
       }
       if (matchesQuery(item, query)) items.push(item)

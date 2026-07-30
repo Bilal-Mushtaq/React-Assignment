@@ -20,7 +20,7 @@ export const widgetDefinitions: Record<WidgetId, WidgetDefinition> = {
   cameras: { id: 'cameras', title: 'Cameras', component: CamerasWidget },
   alerts: { id: 'alerts', title: 'Alert Panel', component: AlertsWidget },
   incidents: { id: 'incidents', title: 'Incident Timeline', component: IncidentsWidget },
-  analytics: { id: 'analytics', title: 'Analytics & Heatmap', component: AnalyticsHeatmapWidget },
+  analytics: { id: 'analytics', title: 'Mall Traffic', component: AnalyticsHeatmapWidget },
   activity: { id: 'activity', title: 'Activity Feed', component: ActivityFeedWidget },
 }
 
@@ -29,7 +29,7 @@ export const defaultPinnedWidgetIds: WidgetId[] = []
 export function getDefaultLayouts(): ResponsiveLayouts {
   const lg: Layout = [
     { i: 'kpis', x: 0, y: 0, w: 3, h: 5, minW: 2, minH: 4 },
-    { i: 'cameras', x: 3, y: 0, w: 6, h: 17, minW: 2, minH: 10 },
+    { i: 'cameras', x: 3, y: 0, w: 6, h: 16, minW: 2, minH: 10 },
     { i: 'activity', x: 9, y: 0, w: 3, h: 16, minW: 2, minH: 6 },
     { i: 'incidents', x: 0, y: 5, w: 3, h: 11, minW: 2, minH: 5 },
     { i: 'analytics', x: 0, y: 16, w: 8, h: 13, minW: 3, minH: 9 },

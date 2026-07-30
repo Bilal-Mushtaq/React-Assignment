@@ -7,6 +7,7 @@ import { formatRelativeTime } from '../../../utils/format'
 import { Badge } from '../../../components/ui/badge'
 import { Button } from '../../../components/ui/button'
 import { cn } from '../../../lib/cn'
+import { overlayTransition, panelTransition } from '../../../lib/motion'
 import type { AppNotification, NotificationGroup } from '../../../types/domain'
 
 type FilterId = 'all' | NotificationGroup
@@ -196,7 +197,7 @@ export function NotificationPanel() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
+                    transition={overlayTransition}
                     className="fixed inset-0 z-[180] cursor-default bg-black/35 sm:bg-black/20"
                     aria-label="Close notifications"
                     onClick={close}
@@ -204,10 +205,10 @@ export function NotificationPanel() {
                   <motion.div
                     ref={panelRef}
                     id="notification-center"
-                    initial={{ opacity: 0, y: 24, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 16, scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    initial={{ opacity: 0, y: 20, scale: 0.97, filter: 'blur(4px)' }}
+                    animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, y: 12, scale: 0.98, filter: 'blur(3px)' }}
+                    transition={panelTransition}
                     className={cn(
                       'fixed z-[190] flex flex-col overflow-hidden border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface-elevated)_92%,transparent)] shadow-[var(--shadow-lg)] backdrop-blur-xl',
                       '[background-image:linear-gradient(180deg,var(--highlight),transparent_24%)]',

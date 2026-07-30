@@ -241,3 +241,162 @@ export function SettingsSkeleton() {
     </div>
   )
 }
+
+export function CamerasSkeleton() {
+  return (
+    <div className="space-y-4" aria-busy="true" aria-label="Loading cameras">
+      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)]">
+        <div className="space-y-2">
+          <Bone className="h-3 w-28" />
+          <Bone className="h-5 w-40" />
+          <Bone className="h-3 w-64 max-w-full" />
+        </div>
+        <div className="flex gap-1.5">
+          <Bone className="h-6 w-16 rounded-full" />
+          <Bone className="h-6 w-16 rounded-full" />
+        </div>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]"
+          >
+            <Bone className="h-48 w-full rounded-none" />
+            <div className="space-y-2 p-3.5">
+              <Bone className="h-4 w-36" />
+              <Bone className="h-3 w-28" />
+              <Bone className="h-3 w-44" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function ActivitySkeleton() {
+  return (
+    <div className="space-y-4" aria-busy="true" aria-label="Loading activity">
+      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)]">
+        <div className="space-y-2">
+          <Bone className="h-3 w-28" />
+          <Bone className="h-5 w-44" />
+          <Bone className="h-3 w-56 max-w-full" />
+        </div>
+        <div className="flex gap-1.5">
+          <Bone className="h-6 w-20 rounded-full" />
+          <Bone className="h-6 w-16 rounded-full" />
+        </div>
+      </div>
+      <Bone className="h-10 w-full rounded-xl" />
+      <div className="flex gap-1.5 overflow-hidden">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Bone key={i} className="h-9 w-24 shrink-0 rounded-xl" />
+        ))}
+      </div>
+      <div className="space-y-2 rounded-2xl border border-[color:var(--border)] p-3">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Bone key={i} className="h-16 w-full" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function AlertsSkeleton() {
+  return (
+    <div className="space-y-4" aria-busy="true" aria-label="Loading alerts">
+      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)]">
+        <div className="space-y-2">
+          <Bone className="h-3 w-28" />
+          <Bone className="h-5 w-32" />
+          <Bone className="h-3 w-64 max-w-full" />
+        </div>
+        <Bone className="h-6 w-20 rounded-full" />
+      </div>
+      <Bone className="h-10 w-full rounded-xl" />
+      <div className="flex gap-1.5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Bone key={i} className="h-9 w-20 rounded-xl" />
+        ))}
+      </div>
+      <div className="space-y-2 rounded-2xl border border-[color:var(--border)] p-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Bone key={i} className="h-20 w-full" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function IncidentsSkeleton() {
+  return (
+    <div className="space-y-4" aria-busy="true" aria-label="Loading incidents">
+      <div className="flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-elevated)]/80 p-4 shadow-[var(--shadow-sm)]">
+        <div className="space-y-2">
+          <Bone className="h-3 w-28" />
+          <Bone className="h-5 w-48" />
+          <Bone className="h-3 w-56 max-w-full" />
+        </div>
+        <div className="flex gap-1.5">
+          <Bone className="h-6 w-16 rounded-full" />
+          <Bone className="h-6 w-16 rounded-full" />
+        </div>
+      </div>
+      <Bone className="h-10 w-full rounded-xl" />
+      <div className="space-y-3 rounded-2xl border border-[color:var(--border)] p-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex gap-3">
+            <Bone className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full" />
+            <Bone className="h-16 flex-1" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function TrafficSkeleton() {
+  return (
+    <div className="space-y-5" aria-busy="true" aria-label="Loading mall traffic">
+      <Bone className="h-32 w-full rounded-2xl" />
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Bone key={i} className="h-28 rounded-2xl" />
+        ))}
+      </div>
+      <Bone className="h-64 w-full rounded-2xl" />
+      <div className="grid gap-4 lg:grid-cols-5">
+        <Bone className="h-72 rounded-2xl lg:col-span-3" />
+        <Bone className="h-72 rounded-2xl lg:col-span-2" />
+      </div>
+      <Bone className="h-56 w-full rounded-2xl" />
+    </div>
+  )
+}
+
+export function CameraDetailSkeleton() {
+  return (
+    <div className="space-y-4" aria-busy="true" aria-label="Loading camera">
+      <Bone className="h-8 w-28" />
+      <div className="overflow-hidden rounded-2xl border border-[color:var(--border)]">
+        <div className="grid lg:grid-cols-[1.35fr_1fr]">
+          <Bone className="min-h-[260px] w-full rounded-none" />
+          <div className="space-y-3 bg-[color:var(--surface-elevated)] p-5">
+            <Bone className="h-4 w-24" />
+            <Bone className="h-5 w-40" />
+            <div className="grid grid-cols-2 gap-2">
+              <Bone className="h-20" />
+              <Bone className="h-20" />
+            </div>
+            <Bone className="h-24" />
+            <Bone className="h-3 w-full" />
+          </div>
+        </div>
+      </div>
+      <Bone className="h-10 w-full rounded-xl" />
+      <Bone className="h-48 w-full rounded-2xl" />
+    </div>
+  )
+}

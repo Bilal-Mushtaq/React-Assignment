@@ -44,7 +44,7 @@ function SectionTitle({ title, description }: { title: string; description: stri
 }
 
 export default function SettingsRoute() {
-  const ready = usePageReady()
+  const ready = usePageReady('settings', 420, true)
   const mode = useThemeStore((s) => s.mode)
   const accent = useThemeStore((s) => s.accent)
   const baseFontSize = useThemeStore((s) => s.baseFontSize)

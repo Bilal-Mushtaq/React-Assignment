@@ -9,6 +9,7 @@ import {
 import { gridBounds, minMaxSize } from 'react-grid-layout/core'
 import { Star, ChevronsDownUp, GripVertical, Lock } from 'lucide-react'
 import { useDashboardStore } from '../../../store/dashboardStore'
+import { useBootStore } from '../../../store/bootStore'
 import { widgetDefinitions, type WidgetId } from '../widgets/widgetRegistry'
 import { cn } from '../../../lib/cn'
 import { layoutsEqual, normalizeLayouts } from '../utils/normalizeLayouts'
@@ -156,6 +157,8 @@ export function WidgetGrid() {
   const togglePinned = useDashboardStore((s) => s.togglePinned)
   const isApplyingHistory = useDashboardStore((s) => s.isApplyingHistory)
   const clearApplyingHistory = useDashboardStore((s) => s.clearApplyingHistory)
+  const bootComplete = useBootStore((s) => s.complete)
+  const playedBoot = useBootStore((s) => s.playedThisSession)
 
   const pinnedSet = useMemo(() => new Set(pinnedWidgetIds), [pinnedWidgetIds])
   const effectiveLayouts = useMemo(
@@ -169,17 +172,34 @@ export function WidgetGrid() {
   const skipMountCommitRef = useRef(true)
   const skipNextLayoutChangeRef = useRef(false)
   const dragSessionRef = useRef<{ id: string; preferredW: number } | null>(null)
+  const widthRef = useRef(0)
+  const rafWidthRef = useRef(0)
 
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
 
-    const update = () => setWidth(el.getBoundingClientRect().width)
+    const commitWidth = (next: number) => {
+      // Ignore sub-pixel / scrollbar gutter noise — prevents XL continuous reflow flash
+      if (Math.abs(next - widthRef.current) < 2) return
+      widthRef.current = next
+      setWidth(next)
+    }
+
+    const update = () => {
+      const next = Math.round(el.getBoundingClientRect().width)
+      if (rafWidthRef.current) cancelAnimationFrame(rafWidthRef.current)
+      rafWidthRef.current = requestAnimationFrame(() => commitWidth(next))
+    }
+
     update()
 
-    const observer = new ResizeObserver(() => update())
+    const observer = new ResizeObserver(update)
     observer.observe(el)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      if (rafWidthRef.current) cancelAnimationFrame(rafWidthRef.current)
+    }
   }, [])
 
   useEffect(() => {
@@ -292,7 +312,7 @@ export function WidgetGrid() {
       aria-label="Dashboard widget grid"
     >
       <ResponsiveGridLayout
-        className="layout vigil-grid"
+        className={cn('layout vigil-grid', bootComplete && playedBoot && 'vigil-grid--reveal')}
         width={width}
         layouts={effectiveLayouts}
         compactor={verticalCompactor}

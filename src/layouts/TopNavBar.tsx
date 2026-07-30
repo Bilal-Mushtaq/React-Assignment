@@ -1,10 +1,12 @@
 import { Menu, Moon, PanelLeft, Search, Settings as SettingsIcon, Sun } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { NotificationPanel } from '../features/notifications/components/NotificationPanel'
 import { useCommandPaletteStore } from '../store/commandPaletteStore'
 import { useThemeStore } from '../store/themeStore'
 import { useUiStore } from '../store/uiStore'
 import { useActivityStore } from '../store/activityStore'
+import { useCameraStore } from '../store/cameraStore'
+import { SITE } from '../constants/mockData'
 import { cn } from '../lib/cn'
 
 function isApplePlatform() {
@@ -16,11 +18,17 @@ function isApplePlatform() {
 
 const PAGE_META: Record<string, { eyebrow: string; title: string }> = {
   '/dashboard': { eyebrow: 'Operations', title: 'Dashboard' },
+  '/cameras': { eyebrow: SITE.name, title: 'Cameras' },
+  '/activity': { eyebrow: SITE.name, title: 'Activity' },
+  '/alerts': { eyebrow: SITE.name, title: 'Alerts' },
+  '/incidents': { eyebrow: SITE.name, title: 'Incidents' },
+  '/traffic': { eyebrow: SITE.name, title: 'Mall Traffic' },
   '/settings': { eyebrow: 'Preferences', title: 'Settings' },
 }
 
 export function TopNavBar() {
   const location = useLocation()
+  const params = useParams()
   const openPalette = useCommandPaletteStore((s) => s.openPalette)
   const toggleMobileNav = useUiStore((s) => s.toggleMobileNav)
   const sidebarExpanded = useThemeStore((s) => s.sidebarExpanded)
@@ -29,15 +37,34 @@ export function TopNavBar() {
   const setMode = useThemeStore((s) => s.setMode)
   const totalGenerated = useActivityStore((s) => s.totalGenerated)
 
+  const detailCameraId =
+    params.cameraId ??
+    (location.pathname.startsWith('/cameras/')
+      ? location.pathname.split('/')[2]
+      : undefined)
+
+  const detailCamera = useCameraStore((s) =>
+    detailCameraId ? s.cameras.find((c) => c.id === detailCameraId) : undefined,
+  )
+
   const isDark =
     mode === 'dark' ||
     (mode === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   const toggleTheme = () => setMode(isDark ? 'light' : 'dark')
 
-  const meta =
-    Object.entries(PAGE_META).find(([path]) => location.pathname.startsWith(path))?.[1] ??
-    PAGE_META['/dashboard']
+  const meta = (() => {
+    if (detailCameraId) {
+      return {
+        eyebrow: 'Camera detail',
+        title: detailCamera?.zone ?? detailCamera?.name ?? 'Camera',
+      }
+    }
+    return (
+      Object.entries(PAGE_META).find(([path]) => location.pathname.startsWith(path))?.[1] ??
+      PAGE_META['/dashboard']
+    )
+  })()
 
   const shortcut = isApplePlatform() ? '⌘K' : 'Ctrl+K'
 

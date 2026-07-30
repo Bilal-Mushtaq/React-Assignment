@@ -5,10 +5,6 @@ function overlapsVertically(aY: number, aH: number, bY: number, bH: number) {
   return aY < bY + bH && aY + aH > bY
 }
 
-/**
- * Max consecutive free columns starting at `x` for a band of height `h`,
- * ignoring the item being moved.
- */
 export function getAvailableWidth(
   layout: Layout,
   itemId: string,
@@ -33,11 +29,6 @@ export function getAvailableWidth(
   return free
 }
 
-/**
- * Shrink (or restore toward preferredW) only when there is a real free gap
- * of at least minW. If the drop target is fully occupied, leave width alone
- * and let vertical compaction push neighbors — avoids shrink/collide loops.
- */
 export function fitItemWidth(
   layout: Layout,
   item: LayoutItem,

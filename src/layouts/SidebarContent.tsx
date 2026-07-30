@@ -15,6 +15,7 @@ import { useUiStore } from '../store/uiStore'
 import { useAlertsStore } from '../store/alertsStore'
 import { Badge } from '../components/ui/badge'
 import { StatusDot } from '../components/ui/status-dot'
+import { SITE } from '../constants/mockData'
 import { scrollToWidget } from '../features/command-palette/utils/scrollToWidget'
 import type { WidgetId } from '../features/dashboard/widgets/widgetRegistry'
 import { fadeQuick, fadeSoft } from '../lib/motion'
@@ -27,7 +28,7 @@ const dashboardChildren: Array<{
   { label: 'Cameras', icon: Camera, widgetId: 'cameras' },
   { label: 'Activity', icon: Radio, widgetId: 'activity' },
   { label: 'Incidents', icon: ActivitySquare, widgetId: 'incidents' },
-  { label: 'Analytics', icon: PieChart, widgetId: 'analytics' },
+  { label: 'Mall Traffic', icon: PieChart, widgetId: 'analytics' },
   { label: 'Alerts', icon: Bell, widgetId: 'alerts' },
 ]
 
@@ -46,15 +47,19 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
   const activeAlerts = useAlertsStore(
     (s) => s.alerts.filter((a) => a.status !== 'resolved').length,
   )
-  const [dashboardOpen, setDashboardOpen] = useState(true)
+  const [dashboardOpen, setDashboardOpen] = useState(false)
 
   const onDashboard = location.pathname.startsWith('/dashboard')
+  const onCameras = location.pathname.startsWith('/cameras')
+  const onActivity = location.pathname.startsWith('/activity')
+  const onAlerts = location.pathname.startsWith('/alerts')
+  const onIncidents = location.pathname.startsWith('/incidents')
+  const onTraffic = location.pathname.startsWith('/traffic')
   const onSettings = location.pathname.startsWith('/settings')
 
   const goDashboard = () => {
     setActiveWidgetId(null)
     if (!onDashboard) navigate('/dashboard')
-    setDashboardOpen(true)
     onNavigate?.()
   }
 
@@ -141,7 +146,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
           ) : null}
         </AnimatePresence>
 
-        <div className={cn(expanded && dashboardOpen && onDashboard && 'rounded-2xl bg-[color:var(--surface-muted)]/55 p-1')}>
+        <div>
           <div className="flex items-center gap-0.5">
             <button
               type="button"
@@ -249,48 +254,180 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
               </motion.div>
             ) : null}
           </AnimatePresence>
-
-          {!expanded ? (
-            <div className="mt-0.5 space-y-0.5" role="group" aria-label="Dashboard widgets">
-              {dashboardChildren.map((item) => {
-                const Icon = item.icon
-                const active = onDashboard && activeWidgetId === item.widgetId
-                return (
-                  <button
-                    key={item.widgetId}
-                    type="button"
-                    title={item.label}
-                    aria-label={item.label}
-                    onClick={() => goWidget(item.widgetId)}
-                    className={cn(
-                      'group relative flex w-full items-center justify-center rounded-xl p-2.5 outline-none transition-all duration-300 ease-out focus-ring',
-                      active
-                        ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)]'
-                        : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
-                    )}
-                  >
-                    {active ? (
-                      <span
-                        className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
-                        aria-hidden="true"
-                      />
-                    ) : null}
-                    <Icon
-                      size={18}
-                      className={cn(
-                        'shrink-0 transition-colors',
-                        active
-                          ? 'text-[color:var(--accent)]'
-                          : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
-                      )}
-                      aria-hidden="true"
-                    />
-                  </button>
-                )
-              })}
-            </div>
-          ) : null}
         </div>
+
+        <NavLink
+          to="/cameras"
+          title={expanded ? undefined : 'Cameras'}
+          onClick={() => {
+            setActiveWidgetId(null)
+            onNavigate?.()
+          }}
+          className={cn(
+            'group relative flex items-center rounded-xl text-sm font-medium outline-none transition-all duration-300 ease-out focus-ring',
+            expanded ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
+            onCameras
+              ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+              : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+          )}
+        >
+          {!expanded && onCameras ? (
+            <span
+              className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+              aria-hidden="true"
+            />
+          ) : null}
+          <Camera
+            size={18}
+            className={cn(
+              'shrink-0 transition-colors duration-300 ease-out',
+              onCameras ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+            )}
+            aria-hidden="true"
+          />
+          {expanded ? <span className="truncate">Cameras</span> : null}
+        </NavLink>
+
+        <NavLink
+          to="/activity"
+          title={expanded ? undefined : 'Activity'}
+          onClick={() => {
+            setActiveWidgetId(null)
+            onNavigate?.()
+          }}
+          className={cn(
+            'group relative flex items-center rounded-xl text-sm font-medium outline-none transition-all duration-300 ease-out focus-ring',
+            expanded ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
+            onActivity
+              ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+              : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+          )}
+        >
+          {!expanded && onActivity ? (
+            <span
+              className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+              aria-hidden="true"
+            />
+          ) : null}
+          <Radio
+            size={18}
+            className={cn(
+              'shrink-0 transition-colors duration-300 ease-out',
+              onActivity ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+            )}
+            aria-hidden="true"
+          />
+          {expanded ? <span className="truncate">Activity</span> : null}
+        </NavLink>
+
+        <NavLink
+          to="/alerts"
+          title={expanded ? undefined : 'Alerts'}
+          onClick={() => {
+            setActiveWidgetId(null)
+            onNavigate?.()
+          }}
+          className={cn(
+            'group relative flex items-center rounded-xl text-sm font-medium outline-none transition-all duration-300 ease-out focus-ring',
+            expanded ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
+            onAlerts
+              ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+              : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+          )}
+        >
+          {!expanded && onAlerts ? (
+            <span
+              className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+              aria-hidden="true"
+            />
+          ) : null}
+          <Bell
+            size={18}
+            className={cn(
+              'shrink-0 transition-colors duration-300 ease-out',
+              onAlerts ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+            )}
+            aria-hidden="true"
+          />
+          {expanded ? (
+            <span className="flex min-w-0 flex-1 items-center justify-between gap-2 truncate">
+              <span className="truncate">Alerts</span>
+              {activeAlerts > 0 ? (
+                <Badge tone="danger" className="shrink-0 normal-case tracking-normal">
+                  {activeAlerts}
+                </Badge>
+              ) : null}
+            </span>
+          ) : null}
+        </NavLink>
+
+        <NavLink
+          to="/incidents"
+          title={expanded ? undefined : 'Incidents'}
+          onClick={() => {
+            setActiveWidgetId(null)
+            onNavigate?.()
+          }}
+          className={cn(
+            'group relative flex items-center rounded-xl text-sm font-medium outline-none transition-all duration-300 ease-out focus-ring',
+            expanded ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
+            onIncidents
+              ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+              : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+          )}
+        >
+          {!expanded && onIncidents ? (
+            <span
+              className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+              aria-hidden="true"
+            />
+          ) : null}
+          <ActivitySquare
+            size={18}
+            className={cn(
+              'shrink-0 transition-colors duration-300 ease-out',
+              onIncidents
+                ? 'text-[color:var(--accent)]'
+                : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+            )}
+            aria-hidden="true"
+          />
+          {expanded ? <span className="truncate">Incidents</span> : null}
+        </NavLink>
+
+        <NavLink
+          to="/traffic"
+          title={expanded ? undefined : 'Mall Traffic'}
+          onClick={() => {
+            setActiveWidgetId(null)
+            onNavigate?.()
+          }}
+          className={cn(
+            'group relative flex items-center rounded-xl text-sm font-medium outline-none transition-all duration-300 ease-out focus-ring',
+            expanded ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5',
+            onTraffic
+              ? 'bg-[color:var(--accent-bg)] text-[color:var(--text-h)] shadow-[inset_0_0_0_1px_var(--accent-border)]'
+              : 'text-[color:var(--text)] hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)]',
+          )}
+        >
+          {!expanded && onTraffic ? (
+            <span
+              className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[color:var(--accent)]"
+              aria-hidden="true"
+            />
+          ) : null}
+          <PieChart
+            size={18}
+            className={cn(
+              'shrink-0 transition-colors duration-300 ease-out',
+              onTraffic
+                ? 'text-[color:var(--accent)]'
+                : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-h)]',
+            )}
+            aria-hidden="true"
+          />
+          {expanded ? <span className="truncate">Mall Traffic</span> : null}
+        </NavLink>
 
         <NavLink
           to="/settings"
@@ -344,7 +481,7 @@ export function SidebarContent({ expanded, onNavigate, showClose, onClose }: Sid
                 </Badge>
               </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-[color:var(--text-muted)]">
-                Event engine streaming simulated ops telemetry.
+                {SITE.name} cameras · live simulated ops telemetry.
               </p>
             </div>
           </motion.div>

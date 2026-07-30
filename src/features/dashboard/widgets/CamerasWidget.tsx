@@ -1,9 +1,11 @@
 import { memo, useMemo } from 'react'
-import { MapPin, Signal, SignalLow, SignalZero, Video } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowRight, MapPin, Signal, SignalLow, SignalZero, Video } from 'lucide-react'
 import { useCameraStore } from '../../../store/cameraStore'
 import { formatDuration, useNow } from '../../../hooks/useNow'
 import { Badge } from '../../../components/ui/badge'
 import { StatusDot } from '../../../components/ui/status-dot'
+import { CameraFeedPreview } from '../../../components/camera/CameraFeedPreview'
 import { cn } from '../../../lib/cn'
 import type { CameraStatus } from '../../../types/domain'
 
@@ -22,6 +24,7 @@ const CameraCard = memo(function CameraCard({
   aiConfidence,
   statusChangedAt,
   now,
+  onOpen,
 }: {
   id: string
   name: string
@@ -30,6 +33,7 @@ const CameraCard = memo(function CameraCard({
   aiConfidence: number
   statusChangedAt: number
   now: number
+  onOpen: () => void
 }) {
   const uptime = formatDuration(Math.max(0, now - statusChangedAt))
   const confidencePct = Math.min(100, Math.max(0, aiConfidence))
@@ -39,38 +43,21 @@ const CameraCard = memo(function CameraCard({
   const isLive = status === 'online' || isRecording
 
   return (
-    <article
+    <button
+      type="button"
+      onClick={onOpen}
       className={cn(
-        'group flex h-[15.5rem] shrink-0 flex-col overflow-hidden rounded-xl border bg-[color:color-mix(in_srgb,var(--surface-muted)_70%,transparent)] shadow-[var(--shadow-sm)] transition duration-300 ease-out [background-image:linear-gradient(180deg,var(--highlight),transparent_35%)]',
+        'group flex h-[15.5rem] w-full shrink-0 flex-col overflow-hidden rounded-xl border bg-[color:color-mix(in_srgb,var(--surface-muted)_70%,transparent)] text-left shadow-[var(--shadow-sm)] transition duration-300 ease-out focus-ring [background-image:linear-gradient(180deg,var(--highlight),transparent_35%)]',
         isOffline
           ? 'border-[color:color-mix(in_srgb,var(--danger)_30%,transparent)] hover:border-[color:color-mix(in_srgb,var(--danger)_45%,transparent)]'
           : isDegraded
             ? 'border-[color:color-mix(in_srgb,var(--warning)_30%,transparent)] hover:border-[color:color-mix(in_srgb,var(--warning)_45%,transparent)]'
             : 'border-[color:var(--border)] hover:border-[color:var(--border-strong)] hover:shadow-[var(--shadow-sm)]',
       )}
-      aria-label={`Camera ${name}`}
+      aria-label={`Open camera ${name}`}
     >
-      <div
-        className={cn(
-          'camera-preview relative flex h-[9.75rem] shrink-0 flex-col justify-between overflow-hidden p-2',
-          isOffline && 'camera-preview--offline',
-          isDegraded && 'camera-preview--degraded',
-        )}
-      >
-        <span className="pointer-events-none absolute left-2 top-2 h-3 w-3 border-l border-t border-white/35" aria-hidden="true" />
-        <span className="pointer-events-none absolute right-2 top-2 h-3 w-3 border-r border-t border-white/35" aria-hidden="true" />
-        <span className="pointer-events-none absolute bottom-2 left-2 h-3 w-3 border-b border-l border-white/35" aria-hidden="true" />
-        <span className="pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b border-r border-white/35" aria-hidden="true" />
-
-        {isLive ? <span className="camera-scanline" aria-hidden="true" /> : null}
-
-        {isOffline ? (
-          <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center gap-1 bg-black/45">
-            <span className="mono text-[10px] font-semibold tracking-[0.18em] text-rose-200/90">NO SIGNAL</span>
-          </div>
-        ) : null}
-
-        <div className="relative z-[2] flex items-start justify-between gap-2">
+      <CameraFeedPreview cameraId={id} status={status} size="sm" className="h-[9.75rem] shrink-0 p-2">
+        <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <Badge
               tone={isOffline ? 'danger' : isRecording ? 'danger' : 'success'}
@@ -93,13 +80,13 @@ const CameraCard = memo(function CameraCard({
           </span>
         </div>
 
-        <div className="relative z-[2] flex items-end justify-between gap-2">
+        <div className="flex items-end justify-between gap-2">
           <span className="inline-flex max-w-[85%] items-center gap-1 truncate rounded-md bg-black/40 px-1.5 py-0.5 text-[10px] text-white/85 backdrop-blur-sm">
             <MapPin size={10} className="shrink-0 opacity-70" aria-hidden="true" />
             <span className="truncate">{zone}</span>
           </span>
         </div>
-      </div>
+      </CameraFeedPreview>
 
       <div className="flex min-h-0 flex-1 flex-col justify-center gap-1.5 px-2.5 py-2">
         <div className="min-w-0">
@@ -140,13 +127,14 @@ const CameraCard = memo(function CameraCard({
           </div>
         </div>
       </div>
-    </article>
+    </button>
   )
 })
 
 export function CamerasWidget() {
   const cameras = useCameraStore((s) => s.cameras)
   const now = useNow(1000)
+  const navigate = useNavigate()
   const visible = cameras.slice(0, 6)
 
   const counts = useMemo(() => {
@@ -196,12 +184,24 @@ export function CamerasWidget() {
               {counts.offline} off
             </Badge>
           ) : null}
+          <Link
+            to="/cameras"
+            className="ml-0.5 inline-flex items-center gap-0.5 rounded-lg px-1.5 py-1 text-[10px] font-semibold text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-muted)] hover:text-[color:var(--text-h)] focus-ring"
+          >
+            All
+            <ArrowRight size={11} />
+          </Link>
         </div>
       </div>
 
       <div className="widget-scroll grid min-h-0 flex-1 auto-rows-max grid-cols-1 content-start gap-2.5 overflow-y-auto overflow-x-hidden sm:grid-cols-2">
         {visible.map((camera) => (
-          <CameraCard key={camera.id} {...camera} now={now} />
+          <CameraCard
+            key={camera.id}
+            {...camera}
+            now={now}
+            onOpen={() => navigate(`/cameras/${camera.id}`)}
+          />
         ))}
       </div>
     </div>
